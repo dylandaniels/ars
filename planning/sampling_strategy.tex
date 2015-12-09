@@ -12,7 +12,7 @@ $$
  = \sum_{j = 1}^k \frac{1}{h'(x_j)} \exp(h(x_j) + (x' - x_j) h'(x_j)) \bigg\rvert^{z_j}_{x' = z_{j - 1}}
 $$
 $$
- = \sum_{j = 1}^k \frac{u_k(z_j) - u_k(z_{j-1})}{h'(x_j)}
+ = \sum_{j = 1}^k \frac{exp(u_k(z_j)) - exp(u_k(z_{j-1}))}{h'(x_j)}
 $$
 
 Next, in order to use the inverse CDF method for sampling, we must find the CDF for $s_k(x)$, $S_k(x) = c \int_{z_0}^x u_k(x') dx'$:
