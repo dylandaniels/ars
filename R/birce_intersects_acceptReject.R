@@ -1,5 +1,3 @@
-setwd("~/Desktop/243Project/")
-
 library(stats)
 library(numDeriv)
 
@@ -27,17 +25,17 @@ df <- function(x, lambda = 1)
   else
   {
     return( 0 )
-  } 
+  }
 }
 
 getC <- function(funcName, min = -Inf, max = Inf)
 {
-  c <- tryCatch(integrate(Vectorize(as.function(funcName)), min, max), 
-                error = function(e) { 
-                  print("Error in integration") 
-                  return (0) }, 
-                warning = function(w) { 
-                  print("Warning in integration") 
+  c <- tryCatch(integrate(Vectorize(as.function(funcName)), min, max),
+                error = function(e) {
+                  print("Error in integration")
+                  return (0) },
+                warning = function(w) {
+                  print("Warning in integration")
                   return(0)  })
   if ( class(c) == "numeric" )
   {
@@ -67,7 +65,7 @@ convertDerivToLog <- function(f, derivF)
 {
   derivLogF <- function(x)
   {
-    return( (1/f(x))*derivF(x) ) 
+    return( (1/f(x))*derivF(x) )
   }
   return (derivLogF)
 }
@@ -78,20 +76,20 @@ convertDerivToLog <- function(f, derivF)
 #derivFun is an optional derivative function, i.e. g'(x)
 #If no proof against log-concavity is found, the function returns
 #a list of intersecting points z_j, j=1, ... , k-1
-#Note that the returned vector may be smaller than length k-1 if there are 
+#Note that the returned vector may be smaller than length k-1 if there are
 #abscissae points x_j where h'(x_j) == h'(x_{j+1})
 envelopeIntersectPoints <- function ( abscissae, distFun, derivFun = NULL )
 {
   #Sort the x_j points in increasing order:
   abscissae <- sort(abscissae)
-  
+
   #Take the natural logarithm of the distribution function g(x)
   #lnDistFun is our h(x)
   logDistFun <- convertToLog(distFun)
-  
+
   #Evaluate h(x) at the points in abscissae
   hx <- Vectorize(logDistFun)(abscissae)
-  
+
   #If the user did not provide a derivative function
   if ( is.null(derivFun) )
   {
@@ -103,22 +101,22 @@ envelopeIntersectPoints <- function ( abscissae, distFun, derivFun = NULL )
     derivLogFun <- convertDerivToLog(distFun, derivFun)
     dhx <- Vectorize(derivLogFun)(abscissae)
   }
-  
+
   #Check if dhx is decreasing (log-concavity requirement)
   if( sum( abs( dhx - sort(dhx, decreasing = TRUE) ) ) <= 10e-10 )
   {
     #Number of points in abscissae
     k <- length(abscissae)
-    
+
     #Numerator of equation (1)
     numerator <- hx[2:k] - hx[1:k-1] - abscissae[2:k]*dhx[2:k] + abscissae[1:k-1]*dhx[1:k-1]
-    
+
     #Denominator of equation (1)
     denominator <- dhx[1:k-1]-dhx[2:k]
-    
+
     #For points x_j and x_{j+1}, is the derivative the same?
     zeros <- which(denominator <= 10e-10)
-    
+
     #If all the differences are zero, then h(x) must be linear on the abscissae,
     #and there are no intersecting points, the function returns x_1
     if ( length(zeros) == k-1 )
@@ -165,6 +163,6 @@ acceptReject <- function (xStar, lowerFun, upperFun, logDistFun)
   {
     accepted <- TRUE
   }
-  
+
   return (accepted)
 }
