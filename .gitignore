@@ -1,6 +1,7 @@
 .Rproj.user
 .Rhistory
 .RData
+.DS_Store
 planning/*.aux
 planning/*.fdb_latexmk
 planning/*.fls
