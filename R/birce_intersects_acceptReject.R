@@ -55,14 +55,14 @@ isDecreasing <- function (vec)
 #a list of intersecting points z_j, j=1, ... , k-1
 #Note that the returned vector may be smaller than length k-1 if there are 
 #abscissae points x_j where h'(x_j) == h'(x_{j+1})
-envelopeIntersectPoints <- function ( abscissae, logDistFun, logDerivFun )
+envelopeIntersectPoints <- function ( abscissae, hx, dhx )
 {
 
   #Evaluate h(x) at the points in abscissae
-  hx <- Vectorize(logDistFun)(abscissae)
+#  hx <- Vectorize(logDistFun)(abscissae)
   
   #Evaluate h'(x) at the points in abscissae
-  dhx <- Vectorize(logDerivFun)(abscissae)
+#  dhx <- Vectorize(logDerivFun)(abscissae)
   
   #Check if dhx is decreasing (log-concavity requirement)
   if( isDecreasing(dhx) )
