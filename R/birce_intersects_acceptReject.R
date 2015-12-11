@@ -109,7 +109,7 @@ envelopeIntersectPoints <- function ( abscissae, hx, dhx )
   }
 }
 
-updateDistVals <- function(abscissae, hx, dhx, xStar, logDistFunc, logDerivFun)
+updateDistVals <- function(abscissae, hx, dhx, xStar, hxStar, dhxStar)
 {
   leq <- (abscissae <= xStar)
   index <- sum(leq) + 1
@@ -117,6 +117,7 @@ updateDistVals <- function(abscissae, hx, dhx, xStar, logDistFunc, logDerivFun)
   k <- length(abscissae)
   newHx <- rep(0, k+1)
   newDhx <- rep(0, k+1)
+<<<<<<< HEAD
 
   newHx <- c(hx[1:index], logDistFunc(xStar) , hx[(index+1):k])
   newDhx <- c(dhx[1:index], logDerivFun(xStar) , dhx[(index+1):k])
@@ -135,9 +136,23 @@ updateAbscissae <- function(abscissae, xStar)
   index <- sum(leq) + 1
 
   k <- length(abscissae)
+=======
+  
+  newHx <- c(hx[1:index], hxStar , hx[(index+1):k])
+  newDhx <- c(dhx[1:index], dhxStar , dhx[(index+1):k])
+  
+  #Check if the dhx vector is still decreasing
+  if ( (newDhx[index+1] - newDhx[index] > 10e-10) || (newDhx[index+2] - newDhx[index+1] > 10e-10) )
+    warning("In updateDistVals: Log-concavity assumption is violated, the vector of h'(x) is non-decreasing.")
+  
+  
+  #Update the abscissae
+>>>>>>> 6118e346cd3eb2da45d56fcf2f5ac374f0148daa
   newAbs <- rep(0, k+1)
   newAbs <- c(abscissae[1:index], xStar, abscissae[(index+1):k])
   return (newAbs)
+  
+  return( list(hx = newHx, dhx = newDhx, abscissae = newAbs) )
 }
 
 #NOT FINISHED YET
@@ -160,9 +175,12 @@ updateIntersects <- function(abscissae, intersects, xStar, hx, dhx)
   #Intersection of the tangent lines at xStar and x_{index+1}
   newIntersects[index + 1] <- smthng
   newIntersects[(index+2):k] <- intersects[(index+1):k-1]
+<<<<<<< HEAD
 
 
 
+=======
+>>>>>>> 6118e346cd3eb2da45d56fcf2f5ac374f0148daa
 }
 
 
