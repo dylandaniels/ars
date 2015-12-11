@@ -1,23 +1,41 @@
-Mainline <- function(g,abscissae,leftbound=-Inf,rightbound=Inf) { 
+Mainline <- function(n, g, abscissae=NULL, leftbound=-Inf, rightbound=Inf) { 
   h <- function(y) {
-    return (log(g(y)))
+    return(log(g(y)))
   }
-  h_der=function(x){
-    y=x
-    dh_x=diag(attributes(numericDeriv(quote(h(y)),'y'))$gradien)
-return(dh_x)
+  
+  h_der <- function(y) {
+    return(diag(attributes(numericDeriv(quote(h(y)),'y'))$gradien))
   }
-
-#abscissae=ininitialize() # or get abscissae from user input
-hx = h(abscissae)
-dhx = h_der(abscissae)
-z=envelopeIntersectionPoints(abscissae, hx, dhx)
-u=envelope (z, x, xstar, hx, dhx)
-s=normalizedEnvelope(x, z, abscissae, h)
-l=squeezing(h,abscissae,x)
-sample=sampleFromEnvelope(abscissae, z, u, h,x)
-acceptReject <- function (xStar, l, u, h)
-updatestep()
+  
+  #abscissae=initialize() # or get abscissae from user input
+  
+  hx <- h(abscissae)
+  dhx <- h_der(abscissae)
+  
+  i <- 0
+  samples <- numeric(n)
+  
+  while (i < n) {
+    z <- envelopeIntersectionPoints(abscissae, hx, dhx)
+    u <- function (x) {
+      return(envelope(z, abscissae, x, hx, dhx))
+    }
+    l <- function (x) {
+      return(squeezing(hx, abscissae, x))
+    }
+    xstar <- sampleFromEnvelope(abscissae, z, u, hx, dhx)
+    result <- acceptReject(xstar, l, u, h, h_der)
+    if (result$step == 2) {
+      #updateStep(z, xstar, result, abscissae, hx, dhx)
+      newValues <- updateDistVals(abscissae, hx, dhx, xstar, h, h_der)
+      hx <- newValues$hx
+      dhx <- newValues$dhx
+      abscissae <- newValues$abscissae
+    } else if (result$dec) {
+      i <- i + 1
+      samples[i] <- xstar
+    }
+  }
 }
 
 # Need to update later.
