@@ -57,13 +57,6 @@ isDecreasing <- function (vec)
 #abscissae points x_j where h'(x_j) == h'(x_{j+1})
 envelopeIntersectPoints <- function ( abscissae, hx, dhx )
 {
-
-  #Evaluate h(x) at the points in abscissae
-#  hx <- Vectorize(logDistFun)(abscissae)
-  
-  #Evaluate h'(x) at the points in abscissae
-#  dhx <- Vectorize(logDerivFun)(abscissae)
-  
   #Check if dhx is decreasing (log-concavity requirement)
   if( isDecreasing(dhx) )
   {
@@ -116,7 +109,6 @@ envelopeIntersectPoints <- function ( abscissae, hx, dhx )
   }
 }
 
-#NOT FINISHED YET
 updateDistVals <- function(abscissae, hx, dhx, xStar, logDistFunc, logDerivFun)
 {
   leq <- (abscissae <= xStar)
@@ -136,6 +128,19 @@ updateDistVals <- function(abscissae, hx, dhx, xStar, logDistFunc, logDerivFun)
   return( list(hx = newHx, dhx = newDhx) )
 }
 
+updateAbscissae <- function(abscissae, xStar)
+{
+  #Booelean vector
+  leq <- (abscissae <= xStar)
+  index <- sum(leq) + 1
+  
+  k <- length(abscissae)
+  newAbs <- rep(0, k+1)
+  newAbs <- c(abscissae[1:index], xStar, abscissae[(index+1):k])
+  return (newAbs)
+}
+
+#NOT FINISHED YET
 updateIntersects <- function(abscissae, intersects, xStar, hx, dhx)
 {
   leq <- (abscissae <= xStar)
@@ -147,8 +152,10 @@ updateIntersects <- function(abscissae, intersects, xStar, hx, dhx)
   newIntersects[1:(index-1)] <- intersects[1:index-1]
   
   #Intersection of the tangent lines at x_index and xStar
-  xj <- 
-  newIntersects[index] <- hx[index] - hx[index+1] - abscissae[index]*dhx[index] - 
+  xj <- abscissae[index]
+  xj1
+  
+  newIntersects[index] <- hx[index+1] - hx[index] - xStar*dhx[index+1] + abscissae[index]*dhx[index] - 
     
   #Intersection of the tangent lines at xStar and x_{index+1}
   newIntersects[index + 1] <- smthng
@@ -165,7 +172,7 @@ updateIntersects <- function(abscissae, intersects, xStar, hx, dhx)
 #logDistFun is h(x) = ln( g(x) ) function
 #Returns TRUE if xStar is ACCEPTED
 #Returns FALSE if xStar is REJECTED
-acceptReject <- function (xStar, lowerFun, upperFun, logDistFun)
+acceptReject <- function (xStar, lowerFun, upperFun, logDistFun, logDistDerivFun)
 {
   #A random uniform(0,1) value
   w <- runif(1)
@@ -181,6 +188,12 @@ acceptReject <- function (xStar, lowerFun, upperFun, logDistFun)
   else if ( w <= exp ( logDistFun(xStar) - upperVal ) ) #Rejection test
   {
     myList$dec <- TRUE
+    myList$step <- 2
+    myList$hx <- logDistFun(xStar)
+    myList$dhx <- logDistDerivFun(xStar)
+  }
+  else 
+  {
     myList$step <- 2
     myList$hx <- logDistFun(xStar)
     myList$dhx <- logDistDerivFun(xStar)
