@@ -31,7 +31,8 @@ Mainline <- function(n, g, abscissae=NULL, leftbound=-Inf, rightbound=Inf) {
       hx <- newValues$hx
       dhx <- newValues$dhx
       abscissae <- newValues$abscissae
-    } else if (result$dec) {
+    } 
+    if (result$dec) {
       i <- i + 1
       samples[i] <- xstar
     }
