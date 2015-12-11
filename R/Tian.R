@@ -11,7 +11,7 @@ envelope <- function(z,x,xstar,sampleFunc,derivX){
   diffs <- abs(xstar-z)
   #calcuate the index of the min of the differences
   index <- which.min(diffs)
-  
+
   #for the z_index which has the min absolute difference with xstar,
   #either it's the upper bound or lower bound of the interval in which
   #xstar falls
@@ -28,58 +28,38 @@ envelope <- function(z,x,xstar,sampleFunc,derivX){
     }else if (xstar>z[index] && xstar<=z[index+1]){
       ustar <- sampleFunc[index+1]+(xstar-x[index+1])*derivX[index+1]
     }
-    
+
   }
-  
-  
+
+
   #return ustar
   return(ustar)
 }
 
 #to test the function
 ##testtaht
-context('envelope returns the correct u_k(xstar)')
+# context('envelope returns the correct u_k(xstar)')
+#
+# test_that('envelope() returns the correct output', {
+#
+#   z <- c(1,2,3)
+#   x <- c(.5,1.5,2.5)
+#   xstar <- 0.4
+#   sampleFunc <- c(10,20,8)
+#   derivX <- c(1,.8,.6)
+#   expect_equal(envelope(z, x,xstar,sampleFunc,derivX), 9.9)
+# })
+#
+# test_that('envelope() returns the correct output', {
+#
+#   z <- c(1,2,3)
+#   x <- c(.5,1.5,2.5)
+#   xstar <- 2.6
+#   sampleFunc <- c(10,20,8)
+#   derivX <- c(1,.8,.6)
+#   expect_equal(envelope(z, x,xstar,sampleFunc,derivX), 8.06)
+# })
 
-test_that('envelope() returns the correct output', {
-  
-  z <- c(1,2,3)
-  x <- c(.5,1.5,2.5)
-  xstar <- 0.4
-  sampleFunc <- c(10,20,8)
-  derivX <- c(1,.8,.6)
-  expect_equal(envelope(z, x,xstar,sampleFunc,derivX), 9.9)
-})
-
-test_that('envelope() returns the correct output', {
-  
-  z <- c(1,2,3)
-  x <- c(.5,1.5,2.5)
-  xstar <- 2.6
-  sampleFunc <- c(10,20,8)
-  derivX <- c(1,.8,.6)
-  expect_equal(envelope(z, x,xstar,sampleFunc,derivX), 8.06)
-})
-
-##
-#take the vector of z, current value of xstar, and the result of rejection-or-not
-updateStep <- function(z,xstar,result,x,hx,dx){
-  #if the result is true, add xstar to T_x, and update z
-  if (result=TRUE){
-    #add xstar to T_x and sort
-    x <- c(x,xstar)
-    x<- sort(x)
-    
-    #update z
-    z <- envelopeIntersectPoints(x,distFun,derivFun = NULL)
-    
-    ##update hx and dx,maybe we can use envelopeIntersectPoints fucntion
-    ##to also output hx and dx?
-    hx <- hx(x)
-    dx <- dx(x)
-  }
-  
-  
-}
 
 
 

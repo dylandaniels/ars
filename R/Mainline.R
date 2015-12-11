@@ -1,20 +1,20 @@
-Mainline <- function(n, g, abscissae=NULL, leftbound=-Inf, rightbound=Inf) { 
-  h <- function(y) {
+Mainline <- function(n, g, abscissae=NULL, leftbound=-Inf, rightbound=Inf) {
+  h <- function (y) {
     return(log(g(y)))
   }
-  
-  h_der <- function(y) {
+
+  h_der <- function (y) {
     return(diag(attributes(numericDeriv(quote(h(y)),'y'))$gradien))
   }
-  
+
   #abscissae=initialize() # or get abscissae from user input
-  
+
   hx <- h(abscissae)
   dhx <- h_der(abscissae)
-  
+
   i <- 0
   samples <- numeric(n)
-  
+
   while (i < n) {
     z <- envelopeIntersectionPoints(abscissae, hx, dhx)
     u <- function (x) {
@@ -31,7 +31,7 @@ Mainline <- function(n, g, abscissae=NULL, leftbound=-Inf, rightbound=Inf) {
       hx <- newValues$hx
       dhx <- newValues$dhx
       abscissae <- newValues$abscissae
-    } 
+    }
     if (result$dec) {
       i <- i + 1
       samples[i] <- xstar
