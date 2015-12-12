@@ -20,17 +20,24 @@ normalizedEnvelope <- function (x, u, abscissae, z, derivH) {
 sampleFromEnvelope <- function (abscissae, z, u, hx, dhx) {
   unif <- runif(1)
   numPoints <- length(abscissae)
-  partSums <- partialSums(abscissae, z, u, dhx)
+  partSums <- partialSums(z, u, dhx)
   normalizedPartSums <-partSums/partSums[numPoints]
 
   # Find the value t s.t. normalizedPartSums[t - 1] < u < normalizedPartSums[t]
   t <- 1
-  while (unif > normalizedPartialSums[t]) {
+  while (unif > normalizedPartSums[t]) {
     t <- t + 1
   }
 
-  sampledValue <- ((log(dhx[t] * ((unif/partSums[numPoints]) - partSums[t-1]) + exp(u(z[t])))
+  # TODO Dylan: clean this up later
+  if (t == 1) {
+    sampledValue <- ((log(dhx[t] * ((unif*partSums[numPoints])) + exp(u(z[t])))
+      - hx[t]) / dhx[t]) + abscissae[t]
+  } else {
+    sampledValue <- ((log(dhx[t] * ((unif*partSums[numPoints]) - partSums[t-1]) + exp(u(z[t])))
                     - hx[t]) / dhx[t]) + abscissae[t]
+  }
+  print(paste0('sampledValue=', sampledValue))
   return(sampledValue)
 }
 

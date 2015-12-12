@@ -6,34 +6,19 @@
 
 #take the input vector of z(sorted), one value of xstar, vector of h(x) and vector of h'(x)
 #and output the value of u_k(xstar)
-envelope <- function(z,x,xstar,sampleFunc,derivX){
-  #calculate the vector of absolute difference between z and xstar
-  diffs <- abs(xstar-z)
-  #calcuate the index of the min of the differences
-  index <- which.min(diffs)
+# TODO: rename x to abscissae
+# TODO: rename xstar to x
+envelope <- function(z, abscissae, x, hx, dhx) {
+  print(paste0('x=',x))
+  print(paste0('z=',z))
 
-  #for the z_index which has the min absolute difference with xstar,
-  #either it's the upper bound or lower bound of the interval in which
-  #xstar falls
-  if (index==1){
-    #if xstar is closest to z[1],we have two cases
-    if(xstar<=z[1]){
-      ustar <- sampleFunc[1]+(xstar-x[1])*derivX[1]
-    }else{
-      ustar <- sampleFunc[2]+(xstar-x[2])*derivX[2]
-    }
-  } else{
-    if(xstar>=z[index-1] && xstar<=z[index]){
-      ustar <- sampleFunc[index]+(xstar-x[index])*derivX[index]
-    }else if (xstar>z[index] && xstar<=z[index+1]){
-      ustar <- sampleFunc[index+1]+(xstar-x[index+1])*derivX[index+1]
-    }
-
+  if (x == z[length(z)]) {
+    index = length(z) - 1
+  } else {
+    index <- sum(z <= x)
   }
-
-
-  #return ustar
-  return(ustar)
+  ux <- hx[index] + (x - abscissae[index]) * dhx[index]
+  return(ux)
 }
 
 #to test the function
