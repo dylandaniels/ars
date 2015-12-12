@@ -56,7 +56,7 @@ envelopeIntersectPoints <- function ( abscissae, hx, dhx )
     {
       #For the points where the denominator is not equal to zero
       intersects[-zeros] <- numerator[-zeros]/denominator[-zeros]
-
+      
       for (i in 1:length(zeros))
       {
         index <- zeros[i]
@@ -70,6 +70,7 @@ envelopeIntersectPoints <- function ( abscissae, hx, dhx )
     {
       intersects <- numerator/denominator
     }
+    
     return (intersects)
   }
   else #If the h'(x) is not decreasing
@@ -134,7 +135,7 @@ updateDistVals <- function(abscissae, hx, dhx, xStar, hxStar, dhxStar)
     if ( newDhx[index+1] - newDhx[index] > 10e-10 )
       warning("In updateDistVals: Log-concavity assumption is violated, the vector of h'(x) is non-decreasing.")
   }
-      
+
   return( list(hx = newHx, dhx = newDhx, abscissae = newAbs) )
 }
 
