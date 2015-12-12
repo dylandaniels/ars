@@ -44,7 +44,7 @@ Mainline <- function(n, g, abscissae=NULL, leftbound=-Inf, rightbound=Inf) {
     result <- acceptReject(xstar, l, u, h, h_der)
     if (result$step == 2) {
       #updateStep(z, xstar, result, abscissae, hx, dhx)
-      newValues <- updateDistVals(abscissae, hx, dhx, xstar, result$hxStar, result$dhxStar)
+      newValues <- updateDistVals(abscissae, hx, dhx, xstar, result$hx, result$dhx)
       hx <- newValues$hx
       dhx <- newValues$dhx
       abscissae <- newValues$abscissae
