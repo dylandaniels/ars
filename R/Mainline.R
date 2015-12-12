@@ -22,13 +22,14 @@ Mainline <- function(n, g, abscissae=NULL, leftbound=-Inf, rightbound=Inf) {
 
   hx <- h(abscissae)
   dhx <- h_der(abscissae)
+  
+  z <- envelopeIntersectPoints(abscissae, hx, dhx)
+  z <- c(leftbound, z, rightbound)
 
   i <- 0
   samples <- numeric(n)
 
   while (i < n) {
-    z <- envelopeIntersectPoints(abscissae, hx, dhx)
-    z <- c(leftbound, z, rightbound)
     print('-----')
     print(z)
     print('-----')
@@ -44,6 +45,8 @@ Mainline <- function(n, g, abscissae=NULL, leftbound=-Inf, rightbound=Inf) {
     result <- acceptReject(xstar, l, u, h, h_der)
     if (result$step == 2) {
       #updateStep(z, xstar, result, abscissae, hx, dhx)
+      z <- updateIntersects(abscissae, z, hx, dhx, xstar, result$hx, result$dhx)
+      z <- c(leftbound, z, rightbound)
       newValues <- updateDistVals(abscissae, hx, dhx, xstar, result$hx, result$dhx)
       hx <- newValues$hx
       dhx <- newValues$dhx
@@ -54,6 +57,7 @@ Mainline <- function(n, g, abscissae=NULL, leftbound=-Inf, rightbound=Inf) {
       samples[i] <- xstar
     }
   }
+  return (samples)
 }
 
 # Need to update later.

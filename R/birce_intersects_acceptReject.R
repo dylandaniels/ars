@@ -139,26 +139,78 @@ updateDistVals <- function(abscissae, hx, dhx, xStar, hxStar, dhxStar)
   return( list(hx = newHx, dhx = newDhx, abscissae = newAbs) )
 }
 
-#NOT FINISHED YET
-updateIntersects <- function(abscissae, intersects, xStar, hx, dhx)
+#NOT FINISHED YET abscissae, hx, dhx, xstar, result$hx, result$dhx
+updateIntersects <- function(abscissae, oldIntersects, hx, dhx, xStar, hxStar, dhxStar)
 {
   leq <- (abscissae <= xStar)
-  index <- sum(leq) + 1
+  index <- sum(leq)
 
   k <- length(abscissae)
-
+  intersects <- oldIntersects[2:k]
+  
+  cat("\n\n")
+  print(paste0("LENGTH OF ABS: ", k))
+  print(paste0("LENGTH OF OLD INTERSECT: ", length(oldIntersects)))
+  print(paste0("INTERSECTS: ", intersects))
+  cat("\n\n")
+  
+  #Drop -Inf and Inf from two ends of the intersects
+  #intersects <- oldIntersects[2:k]
+  
   newIntersects <- rep(0, k)
-  newIntersects[1:(index-1)] <- intersects[1:index-1]
+  
+  #Only if index >= 2, we copy the first section of intersects
+  if (index > 1)
+    newIntersects[1:(index-1)] <- intersects[1:(index-1)]
+  
+  #Only if index <= k-2, we copy the last section of intersects
+  if (index + 2 <= k )
+    newIntersects[(index+2):k] <- intersects[(index+1):(k-1)]
 
   #Intersection of the tangent lines at x_index and xStar
-  xj <- abscissae[index]
-  xj1
+  if (index != 0 && index != k)
+  {
+    #j = index, we will need to update intersects z_index and z_{index+1}
+    xj <- abscissae[index]
+    xj1 <- abscissae[index+1]
+    
+    #Intersect of x_j and xStar
+    
+    if ((dhx[index] - dhxStar) > 10e-10) #If the tangent values are different
+      newIntersects[index] <- (hxStar - hx[index] - xStar*dhxStar + xj*dhx[index])/(dhx[index] - dhxStar)
+    else if (index == 1) #If index = 1 then this is the first intersect point
+      newIntersects[index] <- min(abscissae)
+    else
+      newIntersects[index] <- newIntersects[index - 1]
 
-  newIntersects[index] <- hx[index+1] - hx[index] - xStar*dhx[index+1] + abscissae[index]*dhx[index] -
-
-  #Intersection of the tangent lines at xStar and x_{index+1}
-  newIntersects[index + 1] <- smthng
-  newIntersects[(index+2):k] <- intersects[(index+1):k-1]
+    #Intersection of the tangent lines at xStar and x_{j+1}
+    if ((dhxStar - dhx[index+1]) > 10e-10) #If the tangent values are different
+      newIntersects[index + 1] <- (hx[index+1] - hxStar - xj1*dhx[index+1] + xStar*dhxStar)/(dhxStar - dhx[index+1])
+    else 
+      newIntersects[index] <- newIntersects[index-1]
+  }
+  else if (index == 0)
+  {
+    xj1 <- abscissae[index+1]
+    
+    #Intersection of the tangent lines at xStar and x_{j+1}
+    if ((dhxStar - dhx[index+1]) > 10e-10) #If the tangent values are different
+      newIntersects[index + 1] <- (hx[index+1] - hxStar - xj1*dhx[index+1] + xStar*dhxStar)/(dhxStar - dhx[index+1])
+    else
+      newIntersects[index + 1] <- min(abscissae)
+  }
+  else #index == k
+  {
+    xj <- abscissae[index]
+    
+    #Intersect of x_j and xStar
+    if ((dhx[index] - dhxStar) > 10e-10) #If the tangent values are different
+      newIntersects[index] <- (hxStar - hx[index] - xStar*dhxStar + xj*dhx[index])/(dhx[index] - dhxStar)
+    else
+      newIntersects[index] <- newIntersects[index-1]
+  }
+  
+  return(newIntersects)
 }
 
 
