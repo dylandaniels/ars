@@ -4,7 +4,13 @@ Mainline <- function(n, g, abscissae=NULL, leftbound=-Inf, rightbound=Inf) {
   }
 
   h_der <- function (y) {
-    return(diag(attributes(numericDeriv(quote(h(y)),'y'))$gradien))
+    # Look into replacing this with grad() function?
+    derivatives <- sapply(y, function (x) {
+      env <- new.env()
+      assign('x', x, envir = env)
+      return(diag(attributes(numericDeriv(quote(h(x)), 'x', env))$gradient))
+    })
+    return(derivatives)
   }
 
   #abscissae=initialize() # or get abscissae from user input
@@ -16,7 +22,7 @@ Mainline <- function(n, g, abscissae=NULL, leftbound=-Inf, rightbound=Inf) {
   samples <- numeric(n)
 
   while (i < n) {
-    z <- envelopeIntersectionPoints(abscissae, hx, dhx)
+    z <- envelopeIntersectPoints(abscissae, hx, dhx)
     u <- function (x) {
       return(envelope(z, abscissae, x, hx, dhx))
     }
