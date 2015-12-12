@@ -18,6 +18,12 @@ Mainline <- function(n, g, abscissae=NULL, leftbound=-Inf, rightbound=Inf) {
   # (2) number of abscissae is greater than 2
   # (3) first and last are at h'(x_1) < 0 and h'(x_k) > 0, respectively.
 
+if(unique(abscissae)!=length(abscissae) || length(abscissae)<=2 || h_der(abscissae[1])>=0 || h_der(abscissae[length(abscissae)])<=0)
+    {
+      print('abscissae check is wrong.')
+      break
+    }
+
   #abscissae=initialize() # or get abscissae from user input
 
   hx <- h(abscissae)
