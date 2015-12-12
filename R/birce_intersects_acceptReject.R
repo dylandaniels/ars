@@ -1,29 +1,3 @@
-#Some trial functions
-f <- function(x, lambda = 1)
-{
-  if ( x >= 0 )
-  {
-    return( lambda*exp(-lambda*x) )
-  }
-  else
-  {
-    return( 0 )
-  }
-}
-
-
-df <- function(x, lambda = 1)
-{
-  if ( x >= 0 )
-  {
-    return( -(lambda^2)*exp(-lambda*x) )
-  }
-  else
-  {
-    return( 0 )
-  }
-}
-
 
 #Returns TRUE if the vec[j+1] <= vec[j] for all j=1...length(vec)-1
 isDecreasing <- function (vec)
@@ -113,20 +87,54 @@ updateDistVals <- function(abscissae, hx, dhx, xStar, hxStar, dhxStar)
   k <- length(abscissae)
   newHx <- rep(0, k+1)
   newDhx <- rep(0, k+1)
-
-  newHx <- c(hx[1:index], hxStar , hx[(index+1):k])
-  newDhx <- c(dhx[1:index], dhxStar , dhx[(index+1):k])
-
-  #Check if the dhx vector is still decreasing
-  # TODO: correct corner case (what if abscissae added at beginning or end?)
-  #if ( (newDhx[index+1] - newDhx[index] > 10e-10) || (newDhx[index+2] - newDhx[index+1] > 10e-10) )
-  #  warning("In updateDistVals: Log-concavity assumption is violated, the vector of h'(x) is non-decreasing.")
-
-
-  #Update the abscissae
   newAbs <- rep(0, k+1)
-  newAbs <- c(abscissae[1:index], xStar, abscissae[(index+1):k])
 
+  if (index != 0 && index != k)
+  {
+    #Update the hx vector    
+    newHx <- c(hx[1:index], hxStar , hx[(index+1):k])
+    
+    #Update the dhx vector
+    newDhx <- c(dhx[1:index], dhxStar , dhx[(index+1):k])
+    
+    #Update the abscissae
+    newAbs <- c(abscissae[1:index], xStar, abscissae[(index+1):k])
+    
+    #Check if the dhx vector is still decreasing
+    if ( (newDhx[index+1] - newDhx[index] > 10e-10) || (newDhx[index+2] - newDhx[index+1] > 10e-10) )
+      warning("In updateDistVals: Log-concavity assumption is violated, the vector of h'(x) is non-decreasing.")
+  }
+  else if (index == 0)
+  {
+    #Update the hx vector 
+    newHx <- c(hxStar , hx[(index+1):k])
+    
+    #Update the dhx vector
+    newDhx <- c(dhxStar , dhx[(index+1):k])
+    
+    #Update the abscissae
+    newAbs <- c(xStar, abscissae[(index+1):k])
+    
+    #Check if the dhx vector is still decreasing
+    if ( newDhx[index+2] - newDhx[index+1] > 10e-10 )
+      warning("In updateDistVals: Log-concavity assumption is violated, the vector of h'(x) is non-decreasing.")
+  }
+  else #If the index == k
+  {
+    #Update the hx vector 
+    newHx <- c(hx[1:index], hxStar)
+    
+    #Update the dhx vector
+    newDhx <- c(dhx[1:index], dhxStar)
+    
+    #Update the abscissae
+    newAbs <- c(abscissae[1:index], xStar)
+    
+    #Check if the dhx vector is still decreasing
+    if ( newDhx[index+1] - newDhx[index] > 10e-10 )
+      warning("In updateDistVals: Log-concavity assumption is violated, the vector of h'(x) is non-decreasing.")
+  }
+      
   return( list(hx = newHx, dhx = newDhx, abscissae = newAbs) )
 }
 
