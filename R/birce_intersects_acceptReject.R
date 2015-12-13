@@ -1,4 +1,17 @@
 
+#Given a function f and df/dx, this function
+#returns the function object of d(ln f)/dx
+convertDerivToLog <- function(f, derivF)
+{
+  derivLogF <- function(x)
+  {
+    return( (1/f(x))*derivF(x) ) 
+  }
+  return (derivLogF)
+}
+
+
+
 #Returns TRUE if the vec[j+1] <= vec[j] for all j=1...length(vec)-1
 isDecreasing <- function (vec)
 {
@@ -139,7 +152,6 @@ updateDistVals <- function(abscissae, hx, dhx, xStar, hxStar, dhxStar)
   return( list(hx = newHx, dhx = newDhx, abscissae = newAbs) )
 }
 
-#NOT FINISHED YET abscissae, hx, dhx, xstar, result$hx, result$dhx
 updateIntersects <- function(abscissae, oldIntersects, hx, dhx, xStar, hxStar, dhxStar)
 {
   leq <- (abscissae <= xStar)
