@@ -1,7 +1,10 @@
 Mainline <- function(n, g, abscissae=NULL, leftbound=-Inf, rightbound=Inf) {
+
   h <- function (y) {
     return(log(g(y)))
   }
+
+  # TODO: Add option for user to provide gradient function.
 
   h_der <- function (y) {
     # Look into replacing this with grad() function?
