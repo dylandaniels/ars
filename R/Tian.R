@@ -9,8 +9,8 @@
 # TODO: rename x to abscissae
 # TODO: rename xstar to x
 envelope <- function(z, abscissae, x, hx, dhx) {
-  print(paste0('x=',x))
-  print(paste0('z=',z))
+  #print(paste0('x=',x))
+  #print(paste0('z=',z))
 
   if (x == z[length(z)]) {
     index = length(z) - 1

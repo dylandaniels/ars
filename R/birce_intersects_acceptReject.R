@@ -56,7 +56,7 @@ envelopeIntersectPoints <- function ( abscissae, hx, dhx )
     {
       #For the points where the denominator is not equal to zero
       intersects[-zeros] <- numerator[-zeros]/denominator[-zeros]
-      
+
       for (i in 1:length(zeros))
       {
         index <- zeros[i]
@@ -70,12 +70,12 @@ envelopeIntersectPoints <- function ( abscissae, hx, dhx )
     {
       intersects <- numerator/denominator
     }
-    
+
     return (intersects)
   }
   else #If the h'(x) is not decreasing
   {
-    warning ("The sampling function is not log-concave.")
+    stop("The sampling function is not log-concave.")
     return (NULL)
   }
 }
@@ -92,48 +92,48 @@ updateDistVals <- function(abscissae, hx, dhx, xStar, hxStar, dhxStar)
 
   if (index != 0 && index != k)
   {
-    #Update the hx vector    
+    #Update the hx vector
     newHx <- c(hx[1:index], hxStar , hx[(index+1):k])
-    
+
     #Update the dhx vector
     newDhx <- c(dhx[1:index], dhxStar , dhx[(index+1):k])
-    
+
     #Update the abscissae
     newAbs <- c(abscissae[1:index], xStar, abscissae[(index+1):k])
-    
+
     #Check if the dhx vector is still decreasing
     if ( (newDhx[index+1] - newDhx[index] > 10e-10) || (newDhx[index+2] - newDhx[index+1] > 10e-10) )
-      warning("In updateDistVals: Log-concavity assumption is violated, the vector of h'(x) is non-decreasing.")
+      stop("In updateDistVals: Log-concavity assumption is violated, the vector of h'(x) is non-decreasing.")
   }
   else if (index == 0)
   {
-    #Update the hx vector 
+    #Update the hx vector
     newHx <- c(hxStar , hx[(index+1):k])
-    
+
     #Update the dhx vector
     newDhx <- c(dhxStar , dhx[(index+1):k])
-    
+
     #Update the abscissae
     newAbs <- c(xStar, abscissae[(index+1):k])
-    
+
     #Check if the dhx vector is still decreasing
     if ( newDhx[index+2] - newDhx[index+1] > 10e-10 )
-      warning("In updateDistVals: Log-concavity assumption is violated, the vector of h'(x) is non-decreasing.")
+      stop("In updateDistVals: Log-concavity assumption is violated, the vector of h'(x) is non-decreasing.")
   }
   else #If the index == k
   {
-    #Update the hx vector 
+    #Update the hx vector
     newHx <- c(hx[1:index], hxStar)
-    
+
     #Update the dhx vector
     newDhx <- c(dhx[1:index], dhxStar)
-    
+
     #Update the abscissae
     newAbs <- c(abscissae[1:index], xStar)
-    
+
     #Check if the dhx vector is still decreasing
     if ( newDhx[index+1] - newDhx[index] > 10e-10 )
-      warning("In updateDistVals: Log-concavity assumption is violated, the vector of h'(x) is non-decreasing.")
+      stop("In updateDistVals: Log-concavity assumption is violated, the vector of h'(x) is non-decreasing.")
   }
 
   return( list(hx = newHx, dhx = newDhx, abscissae = newAbs) )
@@ -147,22 +147,22 @@ updateIntersects <- function(abscissae, oldIntersects, hx, dhx, xStar, hxStar, d
 
   k <- length(abscissae)
   intersects <- oldIntersects[2:k]
-  
-  cat("\n\n")
-  print(paste0("LENGTH OF ABS: ", k))
-  print(paste0("LENGTH OF OLD INTERSECT: ", length(oldIntersects)))
-  print(paste0("INTERSECTS: ", intersects))
-  cat("\n\n")
-  
+
+  #cat("\n\n")
+  #print(paste0("LENGTH OF ABS: ", k))
+  #print(paste0("LENGTH OF OLD INTERSECT: ", length(oldIntersects)))
+  #print(paste0("INTERSECTS: ", intersects))
+  #cat("\n\n")
+
   #Drop -Inf and Inf from two ends of the intersects
   #intersects <- oldIntersects[2:k]
-  
+
   newIntersects <- rep(0, k)
-  
+
   #Only if index >= 2, we copy the first section of intersects
   if (index > 1)
     newIntersects[1:(index-1)] <- intersects[1:(index-1)]
-  
+
   #Only if index <= k-2, we copy the last section of intersects
   if (index + 2 <= k )
     newIntersects[(index+2):k] <- intersects[(index+1):(k-1)]
@@ -173,9 +173,9 @@ updateIntersects <- function(abscissae, oldIntersects, hx, dhx, xStar, hxStar, d
     #j = index, we will need to update intersects z_index and z_{index+1}
     xj <- abscissae[index]
     xj1 <- abscissae[index+1]
-    
+
     #Intersect of x_j and xStar
-    
+
     if ((dhx[index] - dhxStar) > 10e-10) #If the tangent values are different
       newIntersects[index] <- (hxStar - hx[index] - xStar*dhxStar + xj*dhx[index])/(dhx[index] - dhxStar)
     else if (index == 1) #If index = 1 then this is the first intersect point
@@ -186,13 +186,13 @@ updateIntersects <- function(abscissae, oldIntersects, hx, dhx, xStar, hxStar, d
     #Intersection of the tangent lines at xStar and x_{j+1}
     if ((dhxStar - dhx[index+1]) > 10e-10) #If the tangent values are different
       newIntersects[index + 1] <- (hx[index+1] - hxStar - xj1*dhx[index+1] + xStar*dhxStar)/(dhxStar - dhx[index+1])
-    else 
+    else
       newIntersects[index] <- newIntersects[index-1]
   }
   else if (index == 0)
   {
     xj1 <- abscissae[index+1]
-    
+
     #Intersection of the tangent lines at xStar and x_{j+1}
     if ((dhxStar - dhx[index+1]) > 10e-10) #If the tangent values are different
       newIntersects[index + 1] <- (hx[index+1] - hxStar - xj1*dhx[index+1] + xStar*dhxStar)/(dhxStar - dhx[index+1])
@@ -202,14 +202,14 @@ updateIntersects <- function(abscissae, oldIntersects, hx, dhx, xStar, hxStar, d
   else #index == k
   {
     xj <- abscissae[index]
-    
+
     #Intersect of x_j and xStar
     if ((dhx[index] - dhxStar) > 10e-10) #If the tangent values are different
       newIntersects[index] <- (hxStar - hx[index] - xStar*dhxStar + xj*dhx[index])/(dhx[index] - dhxStar)
     else
       newIntersects[index] <- newIntersects[index-1]
   }
-  
+
   return(newIntersects)
 }
 

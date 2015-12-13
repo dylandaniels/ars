@@ -4,8 +4,17 @@
 partialSums <- function (z, u, dhx) {
   lowerZ <- z[-length(z)] # z[1] through z[length(z)-1]
   upperZ <- z[-1] # z[2] through z[length(z)]
+
   # the evaluated integrals of the envelope function between z[j] and z[j-1] (for each j)
-  integrals <- (exp(u(upperZ)) - exp(u(lowerZ))) / dhx
+  integrals <- numeric(length(dhx))
+
+  for (i in 1:length(dhx)) {
+    if (abs(dhx[i]) < 1e-10) {
+      integrals[i] <- exp(u(z[i+1]))*(z[i+1]-z[i])
+    } else {
+      integrals[i] <- (exp(u(z[i+1])) - exp(u(z[i]))) / dhx[i]
+    }
+  }
   return(cumsum(integrals))
 }
 
@@ -29,15 +38,26 @@ sampleFromEnvelope <- function (abscissae, z, u, hx, dhx) {
     t <- t + 1
   }
 
-  # TODO Dylan: clean this up later
-  if (t == 1) {
-    sampledValue <- ((log(dhx[t] * ((unif*partSums[numPoints])) + exp(u(z[t])))
-      - hx[t]) / dhx[t]) + abscissae[t]
+
+  # Handle case where h'(x_t) = 0
+  if (abs(dhx[t]) < 1e-10) {
+    if (t == 1) {
+      sampledValue <- (unif*partSums[numPoints]) / exp(hx[t]) + z[t]
+    } else {
+      sampledValue <- (unif*partSums[numPoints] - partSums[t - 1]) / exp(hx[t]) + z[t]
+    }
   } else {
-    sampledValue <- ((log(dhx[t] * ((unif*partSums[numPoints]) - partSums[t-1]) + exp(u(z[t])))
-                    - hx[t]) / dhx[t]) + abscissae[t]
+    # TODO Dylan: clean this up later
+    # partSums <- c(0, partSums)
+    if (t == 1) {
+      sampledValue <- ((log(dhx[t] * ((unif*partSums[numPoints])) + exp(u(z[t])))
+        - hx[t]) / dhx[t]) + abscissae[t]
+    } else {
+      sampledValue <- ((log(dhx[t] * ((unif*partSums[numPoints]) - partSums[t-1]) + exp(u(z[t])))
+                      - hx[t]) / dhx[t]) + abscissae[t]
+    }
   }
-  print(paste0('sampledValue=', sampledValue))
+  #print(paste0('sampledValue=', sampledValue))
   return(sampledValue)
 }
 

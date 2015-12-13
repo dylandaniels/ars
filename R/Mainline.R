@@ -8,27 +8,46 @@ Mainline <- function(n, g, abscissae=NULL, leftbound=-Inf, rightbound=Inf) {
     derivatives <- sapply(y, function (x) {
       env <- new.env()
       assign('x', x, envir = env)
-      return(diag(attributes(numericDeriv(quote(h(x)), 'x', env))$gradient))
+      result = tryCatch({
+        diag(attributes(numericDeriv(quote(h(x)), 'x', env))$gradient)
+      }, error = function(e) {
+        stop('derivates of initial abscissae could not be evaluted numerically.')
+      })
+      return(result)
     })
     return(derivatives)
   }
+
+  abscissae = sort(abscissae)
 
   # TODO: put in checks for abscissae
   # (1) uniqueness
   # (2) number of abscissae is greater than 2
   # (3) first and last are at h'(x_1) < 0 and h'(x_k) > 0, respectively.
 
-if(unique(abscissae)!=length(abscissae) || length(abscissae)<=2 || h_der(abscissae[1])>=0 || h_der(abscissae[length(abscissae)])<=0)
-    {
-      print('abscissae check is wrong.')
-      break
-    }
+  # TODO Refactor all of the following checks into one function?
+  if (length(unique(abscissae)) != length(abscissae)) {
+    stop('Elements of abscissae should be unique')
+  }
+
+  if (length(abscissae) < 2) {
+    stop('You must provide 2 or more abscissae.')
+  }
+
+  if (leftbound > abscissae[1] || rightbound < abscissae[length(abscissae)]) {
+    stop('Abscissae should be within boundaries.')
+  }
 
   #abscissae=initialize() # or get abscissae from user input
 
   hx <- h(abscissae)
   dhx <- h_der(abscissae)
-  
+
+  if ((is.infinite(leftbound) && dhx[1] <= 0) ||  (is.infinite(rightbound) && dhx[length(dhx)] >= 0)) {
+    # make this more descript later.
+    stop('Invalid abscissae or integral of function is divergent (cannot be normalized to a valid probability distribution)')
+  }
+
   z <- envelopeIntersectPoints(abscissae, hx, dhx)
   z <- c(leftbound, z, rightbound)
 
@@ -36,9 +55,9 @@ if(unique(abscissae)!=length(abscissae) || length(abscissae)<=2 || h_der(absciss
   samples <- numeric(n)
 
   while (i < n) {
-    print('-----')
-    print(z)
-    print('-----')
+    #print('-----')
+    #print(z)
+    #print('-----')
     # TODO: actually make envelope a vector-valued function
     u <- Vectorize(function (x) {
       return(envelope(z, abscissae, x, hx, dhx))
@@ -47,7 +66,7 @@ if(unique(abscissae)!=length(abscissae) || length(abscissae)<=2 || h_der(absciss
       return(squeezing(hx, abscissae, x))
     }
     xstar <- sampleFromEnvelope(abscissae, z, u, hx, dhx)
-    print(paste0('xstar=',xstar))
+    #print(paste0('xstar=',xstar))
     result <- acceptReject(xstar, l, u, h, h_der)
     if (result$step == 2) {
       #updateStep(z, xstar, result, abscissae, hx, dhx)
