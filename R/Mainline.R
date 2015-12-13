@@ -1,24 +1,28 @@
-Mainline <- function(n, g, abscissae=NULL, leftbound=-Inf, rightbound=Inf) {
+Mainline <- function(n, g, dg=NULL, initialPoints=NULL, leftbound=-Inf, rightbound=Inf) {
+
+  abscissae <- initialPoints
 
   h <- function (y) {
     return(log(g(y)))
   }
 
-  # TODO: Add option for user to provide gradient function.
-
-  h_der <- function (y) {
-    # Look into replacing this with grad() function?
-    derivatives <- sapply(y, function (x) {
-      env <- new.env()
-      assign('x', x, envir = env)
-      result = tryCatch({
-        diag(attributes(numericDeriv(quote(h(x)), 'x', env))$gradient)
-      }, error = function(e) {
-        stop('derivates of initial abscissae could not be evaluted numerically.')
+  if (is.null(dg)) {
+    h_der <- function (y) {
+      # Look into replacing this with grad() function?
+      derivatives <- sapply(y, function (x) {
+        env <- new.env()
+        assign('x', x, envir = env)
+        result = tryCatch({
+          diag(attributes(numericDeriv(quote(h(x)), 'x', env))$gradient)
+        }, error = function(e) {
+          stop('derivates of initial abscissae could not be evaluted numerically.')
+        })
+        return(result)
       })
-      return(result)
-    })
-    return(derivatives)
+      return(derivatives)
+    }
+  } else {
+    h_der <- convertDerivToLog(g, dg)
   }
 
   abscissae = sort(abscissae)

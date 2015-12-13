@@ -61,4 +61,8 @@ sampleFromEnvelope <- function (abscissae, z, u, hx, dhx) {
   return(sampledValue)
 }
 
+updatePartialSums <- function (oldPartSums, z, u, dhx) {
+
+}
+
 
