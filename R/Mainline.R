@@ -30,7 +30,6 @@ Mainline <- function(n, g, dg=NULL, initialPoints=NULL, leftbound=-Inf, rightbou
   if (is.null(initialPoints))
     abscissae <- findInitPoints(h, leftbound, rightbound)
 
-  print(abscissae)
   abscissae = sort(abscissae)
 
   # TODO: put in checks for abscissae

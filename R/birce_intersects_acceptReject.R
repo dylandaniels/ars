@@ -206,10 +206,7 @@ updateDistVals <- function(abscissae, hx, dhx, xStar, hxStar, dhxStar)
 
     #Check if the dhx vector is still decreasing
     if ( (newDhx[index+1] - newDhx[index] > 1e-08) || (newDhx[index+2] - newDhx[index+1] > 1e-08) )
-    {print(newDhx[index+2] - newDhx[index+1])
-      print(newDhx[index+1] - newDhx[index])
       stop("In updateDistVals: Log-concavity assumption is violated, the vector of h'(x) is non-decreasing.")
-    }
   }
   else if (index == 0)
   {
@@ -224,11 +221,7 @@ updateDistVals <- function(abscissae, hx, dhx, xStar, hxStar, dhxStar)
 
     #Check if the dhx vector is still decreasing
     if ( newDhx[index+2] - newDhx[index+1] > 1e-08 )
-    {
-      print(newDhx[index+2] - newDhx[index+1])
       stop("In updateDistVals: Log-concavity assumption is violated, the vector of h'(x) is non-decreasing.")
-      
-    }
   }
   else #If the index == k
   {
@@ -243,9 +236,7 @@ updateDistVals <- function(abscissae, hx, dhx, xStar, hxStar, dhxStar)
 
     #Check if the dhx vector is still decreasing
     if ( newDhx[index+1] - newDhx[index] > 1e-08 )
-    {print(newDhx[index+1] - newDhx[index])
       stop("In updateDistVals: Log-concavity assumption is violated, the vector of h'(x) is non-decreasing.")
-    }
   }
 
   return( list(hx = newHx, dhx = newDhx, abscissae = newAbs) )
