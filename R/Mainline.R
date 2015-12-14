@@ -24,7 +24,7 @@ Mainline <- function(n, g, dg=NULL, initialPoints=NULL, leftbound=-Inf, rightbou
   } else {
     h_der <- convertDerivToLog(g, dg)
   }
-  
+
   #If the user does not provide the initial points, then run the
   #findInitPoints function
   if (is.null(initialPoints))
@@ -33,7 +33,7 @@ Mainline <- function(n, g, dg=NULL, initialPoints=NULL, leftbound=-Inf, rightbou
   abscissae = sort(abscissae)
   hx <- h(abscissae)
   dhx <- h_der(abscissae)
-  precheck()
+  precheck(abscissae, dhx, leftbound, rightbound)
   # TODO: put in checks for abscissae
   # (1) uniqueness
   # (2) number of abscissae is greater than 2
