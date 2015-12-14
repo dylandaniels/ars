@@ -1,5 +1,4 @@
 #to test the envelope() function
-library(testthat)
 context('envelope returns the correct u_k(x)')
 
 #Test the regular cases
@@ -23,8 +22,8 @@ test_that('envelope() returns the correct output', {
   expect_equal(envelope(z, abscissae, x, hx, dhx) , 8.06)
 })
 
-#Test the corner case where 'x' equals to the upper bound and lower bound
-test_that('envelope() returns the correct output', {
+#Test the corner case
+test_that('envelope() returns the correct output where x is equal to the upper bound and lower bound', {
 
   z <- c(0,1,2,3)
   abscissae<- c(.5,1.5,2.5)

@@ -75,6 +75,12 @@ Mainline <- function(n, g, dg=NULL, initialPoints=NULL, leftbound=-Inf, rightbou
       samples[i] <- xstar
     }
   }
+
+  x <- seq(0,5,0.01)
+  plot(x, exp(u(x)), type='l')
+  l <- Vectorize(l)
+  points(x, exp(l(x)), col='red',type='l')
+
   return (samples)
 }
 
