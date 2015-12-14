@@ -1,3 +1,4 @@
+library(optimx)
 
 #Given a function f and df/dx, this function
 #returns the function object of d(ln f)/dx
@@ -10,7 +11,96 @@ convertDerivToLog <- function(f, derivF)
   return (derivLogF)
 }
 
+#If the user does not provide an initial ( or a valid) set of initial points,
+#this function returns a set of initial points of size at least 2
+findInitPoints <- function(h, leftbound, rightbound)
+{
+  #Convert h(x) to -h(x)
+  convertToNeg <- function(h)
+  {
+    negh <- function(x)
+    {
+      return ( -h(x) )
+    }
+    return ( negh )
+  }
+  
+  #Convert h(x) into -h(x) because the nlm minimizes the input function
+  negh <- convertToNeg(h)
+  
+  #Some heuristic to find starting point for the optimization
+  lb <- leftbound
+  ub <- rightbound
+  if( is.infinite(leftbound) )
+    lb <- min(0.01, rightbound)
+  if( is.infinite(rightbound) )
+    ub <- max(0.01, leftbound)
+  
+  #If leftbound = -Inf and rightbound = Inf, starting point is 0
+  startPt <- (lb + ub)/2
+  
+  #Assumption: Left Bound and Right Bound are correctly given!!
+  if ( is.infinite(leftbound) && is.infinite(rightbound) )
+  {
+    #Minimize -h(x) using nlm function, where the max number of iterations is 50
+    tryCatch({ sol <- nlm(negh, startPt)
+               modeVal <- sol$estimate }, 
+             error = function(e) { stop("Error in nlm for mode calculation.") }, 
+             warning = function(w) { stop(print(w))})
+  }
+  else #If there are finite bounds at either left or right sides
+  {
+    tryCatch({ sol <- optimx(startPt, negh, method = "L-BFGS-B", lower = leftbound, upper = rightbound)
+              modeVal <- sol[1,1] }, 
+              error = function(e) { stop("Error in optimx for mode calculation.") }, 
+              warning = function(w) { stop(print(w)) })
+  }
+  
+  #If the mode is not within the domain, then throw an error
+  if ( leftbound - 1e-08 > modeVal || modeVal > rightbound + 1e-08)
+    stop("The mode of the function is not within the domain, make sure the domain is defined correctly.")
+  
+  #The initial abscissae of size 3
+  initAbs <- numeric(3)
+  #The middle abscissae point is the mode
+  initAbs[2] <- modeVal
+  
+  #If either left or right bound is infinite
+  if ( is.infinite(leftbound) || is.infinite(rightbound))
+  {
+    #If left bound is -infinity 
+    if( is.infinite(leftbound) ) 
+      initAbs[1] <- modeVal - 1
+    else
+      initAbs[1] <- (leftbound + modeVal)/10
+    
+    #If right bound is infinity 
+    if (is.infinite(rightbound))
+      initAbs[3] <- modeVal + 1
+    else
+      initAbs[3] <- (rightbound + modeVal)/10
+  }
+  else #Both bounds are finite
+  {
+    initAbs[1] <- (leftbound + modeVal)/10
+    initAbs[3] <- (rightbound + modeVal)/10
+  }
+  
+  #Check for uniqueness here because either the leftbound 
+  #or the rightbound may be equal to the mode
+  
+  #If the 1st and 2nd points are different due to numeric error
+  if ( abs(initAbs[1] - initAbs[2]) < 1e-08 )
+    initAbs[1] <- initAbs[2] #Set the 1st point to be the same as the 2nd
+  #If the 2nd and 2rd points are different due to numeric error
+  else if ( abs(initAbs[2] - initAbs[3]) < 1e-08 ) 
+    initAbs[3] <- initAbs[2] #Set the 3rd point to be the same as the 2nd
+  
+  #Drop the repeating points
+  initAbs <- unique(initAbs)
 
+  return(initAbs)
+}
 
 #Returns TRUE if the vec[j+1] <= vec[j] for all j=1...length(vec)-1
 isDecreasing <- function (vec)
@@ -21,7 +111,7 @@ isDecreasing <- function (vec)
   diff <- vec[2:k] - vec[1:k-1]
 
   #Count the number of times the difference is <= 0
-  leq <- sum ( diff <= 10e-10 )
+  leq <- sum ( diff < 1e-08 )
 
   #If all the differences are <= 0, then the vector is decreasing
   if ( leq == k-1 )
@@ -53,7 +143,7 @@ envelopeIntersectPoints <- function ( abscissae, hx, dhx )
     denominator <- dhx[1:k-1]-dhx[2:k]
 
     #For points x_j and x_{j+1}, is the derivative the same?
-    zeros <- which(denominator <= 10e-10)
+    zeros <- which(abs(denominator) < 1e-08)
 
 
     #If all the differences are zero, then h(x) must be linear on the abscissae,
@@ -115,8 +205,11 @@ updateDistVals <- function(abscissae, hx, dhx, xStar, hxStar, dhxStar)
     newAbs <- c(abscissae[1:index], xStar, abscissae[(index+1):k])
 
     #Check if the dhx vector is still decreasing
-    if ( (newDhx[index+1] - newDhx[index] > 10e-10) || (newDhx[index+2] - newDhx[index+1] > 10e-10) )
+    if ( (newDhx[index+1] - newDhx[index] > 1e-08) || (newDhx[index+2] - newDhx[index+1] > 1e-08) )
+    {print(newDhx[index+2] - newDhx[index+1])
+      print(newDhx[index+1] - newDhx[index])
       stop("In updateDistVals: Log-concavity assumption is violated, the vector of h'(x) is non-decreasing.")
+    }
   }
   else if (index == 0)
   {
@@ -130,8 +223,12 @@ updateDistVals <- function(abscissae, hx, dhx, xStar, hxStar, dhxStar)
     newAbs <- c(xStar, abscissae[(index+1):k])
 
     #Check if the dhx vector is still decreasing
-    if ( newDhx[index+2] - newDhx[index+1] > 10e-10 )
+    if ( newDhx[index+2] - newDhx[index+1] > 1e-08 )
+    {
+      print(newDhx[index+2] - newDhx[index+1])
       stop("In updateDistVals: Log-concavity assumption is violated, the vector of h'(x) is non-decreasing.")
+      
+    }
   }
   else #If the index == k
   {
@@ -145,8 +242,10 @@ updateDistVals <- function(abscissae, hx, dhx, xStar, hxStar, dhxStar)
     newAbs <- c(abscissae[1:index], xStar)
 
     #Check if the dhx vector is still decreasing
-    if ( newDhx[index+1] - newDhx[index] > 10e-10 )
+    if ( newDhx[index+1] - newDhx[index] > 1e-08 )
+    {print(newDhx[index+1] - newDhx[index])
       stop("In updateDistVals: Log-concavity assumption is violated, the vector of h'(x) is non-decreasing.")
+    }
   }
 
   return( list(hx = newHx, dhx = newDhx, abscissae = newAbs) )
@@ -158,16 +257,9 @@ updateIntersects <- function(abscissae, oldIntersects, hx, dhx, xStar, hxStar, d
   index <- sum(leq)
 
   k <- length(abscissae)
+  
+  #Drop leftbound and rightbound from the intersects vector
   intersects <- oldIntersects[2:k]
-
-  #cat("\n\n")
-  #print(paste0("LENGTH OF ABS: ", k))
-  #print(paste0("LENGTH OF OLD INTERSECT: ", length(oldIntersects)))
-  #print(paste0("INTERSECTS: ", intersects))
-  #cat("\n\n")
-
-  #Drop -Inf and Inf from two ends of the intersects
-  #intersects <- oldIntersects[2:k]
 
   newIntersects <- rep(0, k)
 
@@ -188,7 +280,7 @@ updateIntersects <- function(abscissae, oldIntersects, hx, dhx, xStar, hxStar, d
 
     #Intersect of x_j and xStar
 
-    if ((dhx[index] - dhxStar) > 10e-10) #If the tangent values are different
+    if (abs(dhx[index] - dhxStar) > 1e-08) #If the tangent values are different
       newIntersects[index] <- (hxStar - hx[index] - xStar*dhxStar + xj*dhx[index])/(dhx[index] - dhxStar)
     else if (index == 1) #If index = 1 then this is the first intersect point
       newIntersects[index] <- min(abscissae)
@@ -196,7 +288,7 @@ updateIntersects <- function(abscissae, oldIntersects, hx, dhx, xStar, hxStar, d
       newIntersects[index] <- newIntersects[index - 1]
 
     #Intersection of the tangent lines at xStar and x_{j+1}
-    if ((dhxStar - dhx[index+1]) > 10e-10) #If the tangent values are different
+    if (abs(dhxStar - dhx[index+1]) > 1e-08) #If the tangent values are different
       newIntersects[index + 1] <- (hx[index+1] - hxStar - xj1*dhx[index+1] + xStar*dhxStar)/(dhxStar - dhx[index+1])
     else
       newIntersects[index] <- newIntersects[index-1]
@@ -206,7 +298,7 @@ updateIntersects <- function(abscissae, oldIntersects, hx, dhx, xStar, hxStar, d
     xj1 <- abscissae[index+1]
 
     #Intersection of the tangent lines at xStar and x_{j+1}
-    if ((dhxStar - dhx[index+1]) > 10e-10) #If the tangent values are different
+    if (abs(dhxStar - dhx[index+1]) > 1e-08) #If the tangent values are different
       newIntersects[index + 1] <- (hx[index+1] - hxStar - xj1*dhx[index+1] + xStar*dhxStar)/(dhxStar - dhx[index+1])
     else
       newIntersects[index + 1] <- min(abscissae)
@@ -216,7 +308,7 @@ updateIntersects <- function(abscissae, oldIntersects, hx, dhx, xStar, hxStar, d
     xj <- abscissae[index]
 
     #Intersect of x_j and xStar
-    if ((dhx[index] - dhxStar) > 10e-10) #If the tangent values are different
+    if (abs(dhx[index] - dhxStar) > 1e-08) #If the tangent values are different
       newIntersects[index] <- (hxStar - hx[index] - xStar*dhxStar + xj*dhx[index])/(dhx[index] - dhxStar)
     else
       newIntersects[index] <- newIntersects[index-1]

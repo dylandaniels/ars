@@ -24,7 +24,13 @@ Mainline <- function(n, g, dg=NULL, initialPoints=NULL, leftbound=-Inf, rightbou
   } else {
     h_der <- convertDerivToLog(g, dg)
   }
+  
+  #If the user does not provide the initial points, then run the
+  #findInitPoints function
+  if (is.null(initialPoints))
+    abscissae <- findInitPoints(h, leftbound, rightbound)
 
+  print(abscissae)
   abscissae = sort(abscissae)
 
   # TODO: put in checks for abscissae
@@ -44,8 +50,6 @@ Mainline <- function(n, g, dg=NULL, initialPoints=NULL, leftbound=-Inf, rightbou
   if (leftbound > abscissae[1] || rightbound < abscissae[length(abscissae)]) {
     stop('Abscissae should be within boundaries.')
   }
-
-  #abscissae=initialize() # or get abscissae from user input
 
   hx <- h(abscissae)
   dhx <- h_der(abscissae)
