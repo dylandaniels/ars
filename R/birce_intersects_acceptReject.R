@@ -86,13 +86,14 @@ findInitPoints <- function(h, leftbound, rightbound)
     initAbs[3] <- (rightbound + modeVal)/10
   }
   
-  #Check for uniqueness here because either the leftbound 
-  #or the rightbound may be equal to the mode
+  #We will check for uniqueness here because either the leftbound 
+  #or the rightbound may be equal to the mode 
+  #(Example: Exponential distribution, lb = 0 and mode = 0)
   
-  #If the 1st and 2nd points are different due to numeric error
+  #If the 1st and 2nd points are the same within some numeric tolerance
   if ( abs(initAbs[1] - initAbs[2]) < 1e-08 )
     initAbs[1] <- initAbs[2] #Set the 1st point to be the same as the 2nd
-  #If the 2nd and 2rd points are different due to numeric error
+  #If the 2nd and 3rd points are the same within some numeric tolerance
   else if ( abs(initAbs[2] - initAbs[3]) < 1e-08 ) 
     initAbs[3] <- initAbs[2] #Set the 3rd point to be the same as the 2nd
   
