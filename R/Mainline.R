@@ -72,7 +72,8 @@ Mainline <- function(n, g, dg=NULL, initialPoints=NULL, leftbound=-Inf, rightbou
     l <- function (x) {
       return(squeezing(hx, abscissae, x))
     }
-    xstar <- sampleFromEnvelope(abscissae, z, u, hx, dhx)
+    integrals <- calculateInitialIntegrals(z, u, dhx)
+    xstar <- sampleFromEnvelope(abscissae, z, integrals, u, hx, dhx)
     #print(paste0('xstar=',xstar))
     result <- acceptReject(xstar, l, u, h, h_der)
     if (result$step == 2) {

@@ -1,7 +1,18 @@
+# lb - lower bound
+# ub - upper bound
+# dhx
+evaluateIntegral <- function (lb, ub, u, dhx) {
+  if (abs(dhx) < 1e-10) {
+    return(exp(u(ub))*(ub - lb))
+  } else {
+    return((exp(u(ub)) - exp(u(lb))) / dhx)
+  }
+}
+
 # z - intersection points of envelope function (Note that z[1] may be -Inf, and z[length(z)] may be Inf)
 # u - envelope function (u(Inf) and u(-Inf) must be valid calls, both should return 0)
 # dhx - vector h'(x) evaluted at each of the abscissae
-partialSums <- function (z, u, dhx) {
+calculateInitialIntegrals <- function (z, u, dhx) {
   lowerZ <- z[-length(z)] # z[1] through z[length(z)-1]
   upperZ <- z[-1] # z[2] through z[length(z)]
 
@@ -9,13 +20,9 @@ partialSums <- function (z, u, dhx) {
   integrals <- numeric(length(dhx))
 
   for (i in 1:length(dhx)) {
-    if (abs(dhx[i]) < 1e-10) {
-      integrals[i] <- exp(u(z[i+1]))*(z[i+1]-z[i])
-    } else {
-      integrals[i] <- (exp(u(z[i+1])) - exp(u(z[i]))) / dhx[i]
-    }
+    integrals[i] <- evaluateIntegral(z[i], z[i+1], u, dhx[i])
   }
-  return(cumsum(integrals))
+  return(integrals)
 }
 
 # Is this function needed??
@@ -26,10 +33,10 @@ normalizedEnvelope <- function (x, u, abscissae, z, derivH) {
   return(exp(u(x))/(partialSums(abscissae, z, u, derivH)[numPoints]))
 }
 
-sampleFromEnvelope <- function (abscissae, z, u, hx, dhx) {
+sampleFromEnvelope <- function (abscissae, z, integrals, u, hx, dhx) {
   unif <- runif(1)
   numPoints <- length(abscissae)
-  partSums <- partialSums(z, u, dhx)
+  partSums <- cumsum(integrals)
   normalizedPartSums <-partSums/partSums[numPoints]
 
   # Find the value t s.t. normalizedPartSums[t - 1] < u < normalizedPartSums[t]
@@ -61,8 +68,27 @@ sampleFromEnvelope <- function (abscissae, z, u, hx, dhx) {
   return(sampledValue)
 }
 
-updatePartialSums <- function (oldPartSums, z, u, dhx) {
 
+updateIntegrals <- function (xStar, oldZ, oldPartSums, oldIntegrals, newZ, u, dhx) {
+  # Find index i where oldZ[i] <= xStar <= oldZ[i+1]
+  i <- sum(oldZ <= xStar)
+
+  if (i == 0) { # xStar < oldZ[1]
+    integrals[3:length(integrals)] <- oldIntegrals[2:length(oldIntegrals)]
+    integrals[1] <- evaluateIntegral(newZ[1], newZ[2], u, dhx[1])
+    integrals[2] <- evaluateIntegral(newZ[2], newZ[3], u, dhx[2])
+  } else if (xStar > oldZ[length(oldZ)]) {
+    integrals[1:length(integrals)-2] <- oldIntegrals[1:length(integrals)-1]
+    integrals[length(integrals)-1] <- evaluateIntegral(newZ[length(newZ)-2], newZ[length(newZ)-1], u, dhx[length(newZ)-2])
+    integrals[length(integrals)] <- evaluateIntegral(newZ[length(newZ)-1], newZ[length(newZ)], u, dhx[length(newZ)-1])
+  } else {
+    # Interior sample
+    integrals[1:i-2] <- oldIntegrals[1:i-2]
+    integrals[i+2:length(integrals)] <- oldIntegrals[i+1:length(oldIntegrals)]
+    for (j in seq(-1,1)) {
+      integrals[i+j] <- evaluateIntegral(newZ[i+j], newZ[i+j+1], u, dhx[i+j])
+    }
+  }
 }
 
 
