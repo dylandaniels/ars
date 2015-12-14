@@ -24,6 +24,11 @@ Mainline <- function(n, g, dg=NULL, initialPoints=NULL, leftbound=-Inf, rightbou
   } else {
     h_der <- convertDerivToLog(g, dg)
   }
+  
+  #If the user does not provide the initial points, then run the
+  #findInitPoints function
+  if (is.null(initialPoints))
+    abscissae <- findInitPoints(h, leftbound, rightbound)
 
   abscissae = sort(abscissae)
   hx <- h(abscissae)
@@ -35,7 +40,7 @@ Mainline <- function(n, g, dg=NULL, initialPoints=NULL, leftbound=-Inf, rightbou
   # (3) first and last are at h'(x_1) < 0 and h'(x_k) > 0, respectively.
 
   # TODO Refactor all of the following checks into one function?
-  
+
   z <- envelopeIntersectPoints(abscissae, hx, dhx)
   z <- c(leftbound, z, rightbound)
 
