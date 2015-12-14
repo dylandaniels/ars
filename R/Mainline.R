@@ -61,29 +61,50 @@ Mainline <- function(n, g, dg=NULL, initialPoints=NULL, leftbound=-Inf, rightbou
   i <- 0
   samples <- numeric(n)
 
+  integrals <- NULL
+
+  u <- Vectorize(function (x) {
+    return(envelope(z, abscissae, x, hx, dhx))
+  })
+
+  l <- function (x) {
+    return(squeezing(hx, abscissae, x))
+  }
+
   while (i < n) {
     #print('-----')
     #print(z)
     #print('-----')
-    # TODO: actually make envelope a vector-valued function
-    u <- Vectorize(function (x) {
-      return(envelope(z, abscissae, x, hx, dhx))
-    })
-    l <- function (x) {
-      return(squeezing(hx, abscissae, x))
+
+    if (is.null(integrals)) {
+      integrals <- calculateInitialIntegrals(z, u, dhx)
     }
-    integrals <- calculateInitialIntegrals(z, u, dhx)
+
     xstar <- sampleFromEnvelope(abscissae, z, integrals, u, hx, dhx)
     #print(paste0('xstar=',xstar))
     result <- acceptReject(xstar, l, u, h, h_der)
     if (result$step == 2) {
       #updateStep(z, xstar, result, abscissae, hx, dhx)
+      print(paste0('oldZ=',z))
       z <- updateIntersects(abscissae, z, hx, dhx, xstar, result$hx, result$dhx)
       z <- c(leftbound, z, rightbound)
+
       newValues <- updateDistVals(abscissae, hx, dhx, xstar, result$hx, result$dhx)
       hx <- newValues$hx
+      print(paste0('oldDhx=', dhx))
       dhx <- newValues$dhx
+      oldAbscissae <- abscissae
       abscissae <- newValues$abscissae
+
+      u <- Vectorize(function (x) {
+        return(envelope(z, abscissae, x, hx, dhx))
+      })
+
+      l <- function (x) {
+        return(squeezing(hx, abscissae, x))
+      }
+
+      integrals <- updateIntegrals(xstar, oldAbscissae, integrals, z, u, dhx)
     }
     if (result$dec) {
       i <- i + 1
