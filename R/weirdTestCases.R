@@ -17,7 +17,6 @@ twoArcsWithFlatPart <- Vectorize(function (x) {
     return(1)
   }
 })
->>>>>>> e128de73db98b273d85bc7b26f12f676955ce2c5
 
 # should fail if unbounded
 quadratic <- function (x) {x^2}
