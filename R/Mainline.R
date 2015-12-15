@@ -25,35 +25,21 @@ Mainline <- function(n, g, dg=NULL, initialPoints=NULL, leftbound=-Inf, rightbou
     h_der <- convertDerivToLog(g, dg)
   }
 
-  abscissae = sort(abscissae)
+  #If the user does not provide the initial points, then run the
+  #findInitPoints function
+  if (is.null(initialPoints))
+    abscissae <- findInitPoints(h, leftbound, rightbound)
 
+  abscissae = sort(abscissae)
+  hx <- h(abscissae)
+  dhx <- h_der(abscissae)
+  precheck(abscissae, dhx, leftbound, rightbound)
   # TODO: put in checks for abscissae
   # (1) uniqueness
   # (2) number of abscissae is greater than 2
   # (3) first and last are at h'(x_1) < 0 and h'(x_k) > 0, respectively.
 
   # TODO Refactor all of the following checks into one function?
-  if (length(unique(abscissae)) != length(abscissae)) {
-    stop('Elements of abscissae should be unique')
-  }
-
-  if (length(abscissae) < 2) {
-    stop('You must provide 2 or more abscissae.')
-  }
-
-  if (leftbound > abscissae[1] || rightbound < abscissae[length(abscissae)]) {
-    stop('Abscissae should be within boundaries.')
-  }
-
-  #abscissae=initialize() # or get abscissae from user input
-
-  hx <- h(abscissae)
-  dhx <- h_der(abscissae)
-
-  if ((is.infinite(leftbound) && dhx[1] <= 0) ||  (is.infinite(rightbound) && dhx[length(dhx)] >= 0)) {
-    # make this more descript later.
-    stop('Invalid abscissae or integral of function is divergent (cannot be normalized to a valid probability distribution)')
-  }
 
   z <- envelopeIntersectPoints(abscissae, hx, dhx)
   z <- c(leftbound, z, rightbound)
@@ -111,6 +97,12 @@ Mainline <- function(n, g, dg=NULL, initialPoints=NULL, leftbound=-Inf, rightbou
       samples[i] <- xstar
     }
   }
+
+  x <- seq(0,5,0.01)
+  plot(x, exp(u(x)), type='l')
+  l <- Vectorize(l)
+  points(x, exp(l(x)), col='red',type='l')
+
   return (samples)
 }
 
