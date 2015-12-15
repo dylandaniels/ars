@@ -1,4 +1,5 @@
 library(optimx)
+eps <- 1e-06
 
 #Given a function f and df/dx, this function
 #returns the function object of d(ln f)/dx
@@ -57,7 +58,7 @@ findInitPoints <- function(h, leftbound, rightbound)
   }
 
   #If the mode is not within the domain, then throw an error
-  if ( leftbound - 1e-08 > modeVal || modeVal > rightbound + 1e-08)
+  if ( leftbound - eps > modeVal || modeVal > rightbound + eps)
     stop("The mode of the function is not within the domain, make sure the domain is defined correctly.")
 
   #The initial abscissae of size 3
@@ -91,10 +92,10 @@ findInitPoints <- function(h, leftbound, rightbound)
   #(Example: Exponential distribution, lb = 0 and mode = 0)
 
   #If the 1st and 2nd points are the same within some numeric tolerance
-  if ( abs(initAbs[1] - initAbs[2]) < 1e-08 )
+  if ( abs(initAbs[1] - initAbs[2]) < eps )
     initAbs[1] <- initAbs[2] #Set the 1st point to be the same as the 2nd
   #If the 2nd and 3rd points are the same within some numeric tolerance
-  else if ( abs(initAbs[2] - initAbs[3]) < 1e-08 )
+  else if ( abs(initAbs[2] - initAbs[3]) < eps )
     initAbs[3] <- initAbs[2] #Set the 3rd point to be the same as the 2nd
 
   #Drop the repeating points
@@ -113,7 +114,7 @@ isDecreasing <- function (vec)
   diff <- vec[2:k] - vec[1:k-1]
 
   #Count the number of times the difference is <= 0
-  leq <- sum ( diff < 1e-08 )
+  leq <- sum ( diff < eps )
 
   #If all the differences are <= 0, then the vector is decreasing
   if ( leq == k-1 )
@@ -143,7 +144,7 @@ envelopeIntersectPoints <- function ( abscissae, hx, dhx )
     denominator <- dhx[1:k-1]-dhx[2:k]
 
     #For points x_j and x_{j+1}, is the derivative the same?
-    zeros <- which(abs(denominator) < 1e-08)
+    zeros <- which(abs(denominator) < eps)
 
 
     #If all the differences are zero, then h(x) must be linear on the abscissae,
@@ -207,7 +208,7 @@ updateDistVals <- function(abscissae, hx, dhx, xStar, hxStar, dhxStar)
     newAbs <- c(abscissae[1:index], xStar, abscissae[(index+1):k])
 
     #Check if the dhx vector is still decreasing
-    if ( (newDhx[index+1] - newDhx[index] > 1e-08) || (newDhx[index+2] - newDhx[index+1] > 1e-08) )
+    if ( (newDhx[index+1] - newDhx[index] > eps) || (newDhx[index+2] - newDhx[index+1] > eps) )
       stop("In updateDistVals: Log-concavity assumption is violated, the vector of h'(x) is non-decreasing.")
   }
   else if (index == 0)
@@ -222,7 +223,7 @@ updateDistVals <- function(abscissae, hx, dhx, xStar, hxStar, dhxStar)
     newAbs <- c(xStar, abscissae[(index+1):k])
 
     #Check if the dhx vector is still decreasing
-    if ( newDhx[index+2] - newDhx[index+1] > 1e-08 )
+    if ( newDhx[index+2] - newDhx[index+1] > eps )
       stop("In updateDistVals: Log-concavity assumption is violated, the vector of h'(x) is non-decreasing.")
   }
   else #If the index == k
@@ -237,7 +238,7 @@ updateDistVals <- function(abscissae, hx, dhx, xStar, hxStar, dhxStar)
     newAbs <- c(abscissae[1:index], xStar)
 
     #Check if the dhx vector is still decreasing
-    if ( newDhx[index+1] - newDhx[index] > 1e-08 )
+    if ( newDhx[index+1] - newDhx[index] > eps )
       stop("In updateDistVals: Log-concavity assumption is violated, the vector of h'(x) is non-decreasing.")
   }
 
