@@ -179,7 +179,7 @@ envelopeIntersectPoints <- function ( abscissae, hx, dhx )
   }
   else #If the h'(x) is not decreasing
   {
-    stop("The sampling function is not log-concave.")
+    stop("The sampling function failed the log-concavity test. The derivative vector is not non-increasing within the numeric threshold.")
     return (NULL)
   }
 }
@@ -209,7 +209,7 @@ updateDistVals <- function(abscissae, hx, dhx, xStar, hxStar, dhxStar)
 
     #Check if the dhx vector is still decreasing
     if ( (newDhx[index+1] - newDhx[index] > eps) || (newDhx[index+2] - newDhx[index+1] > eps) )
-      stop("In updateDistVals: Log-concavity assumption is violated, the vector of h'(x) is non-decreasing.")
+      stop("The sampling function failed the log-concavity test. The derivative vector is not non-increasing within the numeric threshold.")
   }
   else if (index == 0)
   {
@@ -224,7 +224,7 @@ updateDistVals <- function(abscissae, hx, dhx, xStar, hxStar, dhxStar)
 
     #Check if the dhx vector is still decreasing
     if ( newDhx[index+2] - newDhx[index+1] > eps )
-      stop("In updateDistVals: Log-concavity assumption is violated, the vector of h'(x) is non-decreasing.")
+      stop("The sampling function failed the log-concavity test. The derivative vector is not non-increasing within the numeric threshold.")
   }
   else #If the index == k
   {
@@ -239,7 +239,7 @@ updateDistVals <- function(abscissae, hx, dhx, xStar, hxStar, dhxStar)
 
     #Check if the dhx vector is still decreasing
     if ( newDhx[index+1] - newDhx[index] > eps )
-      stop("In updateDistVals: Log-concavity assumption is violated, the vector of h'(x) is non-decreasing.")
+      stop("The sampling function failed the log-concavity test. The derivative vector is not non-increasing within the numeric threshold.")
   }
 
   return( list(hx = newHx, dhx = newDhx, abscissae = newAbs) )
