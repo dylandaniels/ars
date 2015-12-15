@@ -221,7 +221,7 @@ updateIntersects <- function(abscissae, oldIntersects, hx, dhx, xStar, hxStar, d
       newIntersects[index] <- (hxStar - hx[index] - xStar*dhxStar + xj*dhx[index])/(dhx[index] - dhxStar)
     else if (index == 1) #If index = 1 then this is the first intersect point
       newIntersects[index] <- min(abscissae)
-    else
+    else 
     {
       newIntersects[index] <- newIntersects[index-1]
     }
@@ -255,6 +255,14 @@ updateIntersects <- function(abscissae, oldIntersects, hx, dhx, xStar, hxStar, d
     {
       newIntersects[index] <- newIntersects[index-1]
     }
+  }
+  
+  #To fix the corner case of decreasing intersect points
+  idx <- index + 1
+  while ( idx < length(newIntersects) && newIntersects[idx+1] < newIntersects[idx] )
+  {
+    newIntersects[idx + 1] <- newIntersects[idx]
+    idx <- idx + 1
   }
   
   return(newIntersects)
