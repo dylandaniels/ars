@@ -1,12 +1,22 @@
 # Weird test cases
 
-somePartFlat <- function (x) {
-  if (x >=0 && x <= 10) {
-    return(x^2)
+arcWithFlatPart <- Vectorize(function (x) {
+  if (x >= 0 && x <= 1) {
+    return(sqrt(1 - (x - 1)^2))
   } else {
-    return(100)
+    return(1)
   }
-}
+})
+
+twoArcsWithFlatPart <- Vectorize(function (x) {
+  if (x >= 0 && x <= 1) {
+    return(sqrt(1 - (x - 1)^2))
+  } else if (x >= 4 && x <= 5) {
+    return(sqrt(1 - (x - 4)^2))
+  } else {
+    return(1)
+  }
+})
 
 # should fail if unbounded
 quadratic <- function (x) {x^2}

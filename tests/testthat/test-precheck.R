@@ -1,3 +1,5 @@
+context('abscissae pre-check tests')
+
 test_that('precheck() returns the correct output when the elements of the abscessae are not unique', {
   abs=c(0,10,10) # mock abscessae points
   dhx=c(-2,5,5)#mock dhx values
@@ -38,7 +40,7 @@ test_that('precheck() returns the correct output when the dhx values do not sati
   leftbound=-2#mock left bound
   rightbound=Inf#mock right bound
   expect_error(precheck(abs,dhx,leftbound,rightbound), 'Invalid abscissae or integral of function is divergent (cannot be normalized to a valid probability distribution)',fixed=TRUE)
-  })
+})
 
 
 

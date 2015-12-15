@@ -24,7 +24,7 @@ Mainline <- function(n, g, dg=NULL, initialPoints=NULL, leftbound=-Inf, rightbou
   } else {
     h_der <- convertDerivToLog(g, dg)
   }
-  
+
   #If the user does not provide the initial points, then run the
   #findInitPoints function
   if (is.null(initialPoints))
@@ -33,7 +33,7 @@ Mainline <- function(n, g, dg=NULL, initialPoints=NULL, leftbound=-Inf, rightbou
   abscissae = sort(abscissae)
   hx <- h(abscissae)
   dhx <- h_der(abscissae)
-  precheck()
+  precheck(abscissae, dhx, leftbound, rightbound)
   # TODO: put in checks for abscissae
   # (1) uniqueness
   # (2) number of abscissae is greater than 2
@@ -47,34 +47,57 @@ Mainline <- function(n, g, dg=NULL, initialPoints=NULL, leftbound=-Inf, rightbou
   i <- 0
   samples <- numeric(n)
 
+  integrals <- NULL
+
+  u <- Vectorize(function (x) {
+    return(envelope(z, abscissae, x, hx, dhx))
+  })
+
+  l <- function (x) {
+    return(squeezing(hx, abscissae, x))
+  }
+
   while (i < n) {
-    #print('-----')
-    #print(z)
-    #print('-----')
-    # TODO: actually make envelope a vector-valued function
-    u <- Vectorize(function (x) {
-      return(envelope(z, abscissae, x, hx, dhx))
-    })
-    l <- function (x) {
-      return(squeezing(hx, abscissae, x))
+
+    if (is.null(integrals)) {
+      integrals <- calculateInitialIntegrals(z, u, dhx)
     }
-    xstar <- sampleFromEnvelope(abscissae, z, u, hx, dhx)
-    #print(paste0('xstar=',xstar))
+
+    xstar <- sampleFromEnvelope(abscissae, z, integrals, u, hx, dhx)
     result <- acceptReject(xstar, l, u, h, h_der)
     if (result$step == 2) {
-      #updateStep(z, xstar, result, abscissae, hx, dhx)
-      z <- updateIntersects(abscissae, z, hx, dhx, xstar, result$hx, result$dhx)
-      z <- c(leftbound, z, rightbound)
       newValues <- updateDistVals(abscissae, hx, dhx, xstar, result$hx, result$dhx)
       hx <- newValues$hx
       dhx <- newValues$dhx
+      oldAbscissae <- abscissae
       abscissae <- newValues$abscissae
+
+      z <- envelopeIntersectPoints(abscissae, hx, dhx)
+      z <- c(leftbound, z, rightbound)
+
+
+      u <- Vectorize(function (x) {
+        return(envelope(z, abscissae, x, hx, dhx))
+      })
+
+      l <- function (x) {
+        return(squeezing(hx, abscissae, x))
+      }
+
+      integrals <- updateIntegrals(xstar, oldAbscissae, integrals, z, u, dhx)
     }
     if (result$dec) {
       i <- i + 1
       samples[i] <- xstar
     }
   }
+
+  # Uncomment to plot
+#   x <- seq(0,5,0.01)
+#   plot(x, exp(u(x)), type='l')
+#   l <- Vectorize(l)
+#   points(x, exp(l(x)), col='red',type='l')
+
   return (samples)
 }
 
