@@ -59,46 +59,30 @@ sampleFromEnvelope <- function (abscissae, z, integrals, u, hx, dhx) {
       sampledValue <- ((log(dhx[t] * ((unif*partSums[numPoints])) + exp(u(z[t])))
         - hx[t]) / dhx[t]) + abscissae[t]
     } else {
-      print(paste0('dhx=',dhx))
-      print(paste0('t=',t))
-      print(paste0('partSums=', partSums))
       sampledValue <- ((log(dhx[t] * ((unif*partSums[numPoints]) - partSums[t-1]) + exp(u(z[t])))
                       - hx[t]) / dhx[t]) + abscissae[t]
     }
   }
 
-  print(paste0('sampledValue=', sampledValue))
   return(sampledValue)
 }
 
 
 updateIntegrals <- function (xStar, oldAbscissae, oldIntegrals, newZ, u, dhx) {
   # Find index i where oldAbscissae[i] <= xStar <= oldAbscissae[i+1]
-  #print(paste0('oldAbscissae=',oldAbscissae))
-  print(paste0('newZ=',newZ))
   i <- sum(oldAbscissae <= xStar)
-  #print(paste0('length oldIntegrals=', length(oldIntegrals)))
-  #print(paste0('length newZ=', length(newZ)))
-  print(paste0('dhx=', dhx))
-
 
   integrals <- numeric(length(dhx))
 
   if (i == 0) { # on left boundary
-    print('left')
     integrals[3:length(integrals)] <- oldIntegrals[2:length(oldIntegrals)]
     integrals[1] <- evaluateIntegral(newZ[1], newZ[2], u, dhx[1])
     integrals[2] <- evaluateIntegral(newZ[2], newZ[3], u, dhx[2])
   } else if (i == length(oldAbscissae)) { # on right boundary
-    print('right')
     integrals[1:(length(integrals)-2)] <- oldIntegrals[1:(length(oldIntegrals)-1)]
-    print(integrals)
-    print(evaluateIntegral(newZ[length(newZ)-2], newZ[length(newZ)-1], u, dhx[length(newZ)-2]))
     integrals[length(integrals)-1] <- evaluateIntegral(newZ[length(newZ)-2], newZ[length(newZ)-1], u, dhx[length(newZ)-2])
     integrals[length(integrals)] <- evaluateIntegral(newZ[length(newZ)-1], newZ[length(newZ)], u, dhx[length(newZ)-1])
   } else {
-    print('interior')
-    print(paste0('i=',i))
     # Interior sample
     if (i > 1) {
       integrals[1:(i-1)] <- oldIntegrals[1:(i-1)]
@@ -110,8 +94,6 @@ updateIntegrals <- function (xStar, oldAbscissae, oldIntegrals, newZ, u, dhx) {
       integrals[i+j] <- evaluateIntegral(newZ[i+j], newZ[i+j+1], u, dhx[i+j])
     }
   }
-  print(paste0('oldIntegrals=', oldIntegrals))
-  print(paste0('integrals=', integrals))
   return(integrals)
 }
 

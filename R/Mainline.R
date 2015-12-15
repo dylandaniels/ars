@@ -58,29 +58,23 @@ Mainline <- function(n, g, dg=NULL, initialPoints=NULL, leftbound=-Inf, rightbou
   }
 
   while (i < n) {
-    #print('-----')
-    #print(z)
-    #print('-----')
 
     if (is.null(integrals)) {
       integrals <- calculateInitialIntegrals(z, u, dhx)
     }
 
     xstar <- sampleFromEnvelope(abscissae, z, integrals, u, hx, dhx)
-    #print(paste0('xstar=',xstar))
     result <- acceptReject(xstar, l, u, h, h_der)
     if (result$step == 2) {
-      #updateStep(z, xstar, result, abscissae, hx, dhx)
-      print(paste0('oldZ=',z))
-      z <- updateIntersects(abscissae, z, hx, dhx, xstar, result$hx, result$dhx)
-      z <- c(leftbound, z, rightbound)
-
       newValues <- updateDistVals(abscissae, hx, dhx, xstar, result$hx, result$dhx)
       hx <- newValues$hx
-      print(paste0('oldDhx=', dhx))
       dhx <- newValues$dhx
       oldAbscissae <- abscissae
       abscissae <- newValues$abscissae
+
+      z <- envelopeIntersectPoints(abscissae, hx, dhx)
+      z <- c(leftbound, z, rightbound)
+
 
       u <- Vectorize(function (x) {
         return(envelope(z, abscissae, x, hx, dhx))
@@ -98,10 +92,11 @@ Mainline <- function(n, g, dg=NULL, initialPoints=NULL, leftbound=-Inf, rightbou
     }
   }
 
-  x <- seq(0,5,0.01)
-  plot(x, exp(u(x)), type='l')
-  l <- Vectorize(l)
-  points(x, exp(l(x)), col='red',type='l')
+  # Uncomment to plot
+#   x <- seq(0,5,0.01)
+#   plot(x, exp(u(x)), type='l')
+#   l <- Vectorize(l)
+#   points(x, exp(l(x)), col='red',type='l')
 
   return (samples)
 }
