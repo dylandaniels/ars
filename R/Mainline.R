@@ -1,4 +1,4 @@
-Mainline <- function(n, g, dg=NULL, initialPoints=NULL, leftbound=-Inf, rightbound=Inf) {
+Mainline2 <- function(n, g, dg=NULL, initialPoints=NULL, leftbound=-Inf, rightbound=Inf) {
 
   abscissae <- initialPoints
 
@@ -66,15 +66,14 @@ Mainline <- function(n, g, dg=NULL, initialPoints=NULL, leftbound=-Inf, rightbou
     xstar <- sampleFromEnvelope(abscissae, z, integrals, u, hx, dhx)
     result <- acceptReject(xstar, l, u, h, h_der)
     if (result$step == 2) {
+      z <- updateIntersects(abscissae, z, hx, dhx, xstar, result$hx, result$dhx)
+      z <- c(leftbound, z, rightbound)
+      
       newValues <- updateDistVals(abscissae, hx, dhx, xstar, result$hx, result$dhx)
       hx <- newValues$hx
       dhx <- newValues$dhx
       oldAbscissae <- abscissae
       abscissae <- newValues$abscissae
-
-      z <- envelopeIntersectPoints(abscissae, hx, dhx)
-      z <- c(leftbound, z, rightbound)
-
 
       u <- Vectorize(function (x) {
         return(envelope(z, abscissae, x, hx, dhx))

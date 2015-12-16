@@ -176,6 +176,78 @@ envelopeIntersectPoints <- function ( abscissae, hx, dhx )
   }
 }
 
+#Given the new abscissae point, xStar, this function will update the vector
+#of the intersects
+updateIntersects <- function(abscissae, oldIntersects, hx, dhx, xStar, hxStar, dhxStar)
+{
+  leq <- (abscissae <= xStar)
+  index <- sum(leq)
+  
+  k <- length(abscissae)
+  
+  #Drop leftbound and rightbound from the intersects vector
+  intersects <- oldIntersects[2:k]
+  
+  #Initialize the new set of intersects
+  newIntersects <- rep(0, k)
+  
+  #Only if index >= 2, we copy the first section of intersects
+  if (index > 1)
+    newIntersects[1:(index-1)] <- intersects[1:(index-1)]
+  
+  #Only if index <= k-2, we copy the last section of intersects
+  if (index + 2 <= k )
+    newIntersects[(index+2):k] <- intersects[(index+1):(k-1)]
+  
+  #Intersection of the tangent lines at x_index and xStar
+  
+  #If the xStar is inserted to the somewhere in the middle of the abscissae
+  if (index != 0 && index != k)
+  {
+    #j = index, we will need to update intersects z_index and z_{index+1}
+    xj <- abscissae[index]
+    xj1 <- abscissae[index+1]
+    
+    #Intersection of the tangent lines at x_j and xStar
+    if (abs(dhx[index] - dhxStar) > 1e-08) #If the tangent values at x_j and xStar are different
+      newIntersects[index] <- (hxStar - hx[index] - xStar*dhxStar + xj*dhx[index])/(dhx[index] - dhxStar)
+    else #If the tangent values at x_j and xStar are the same
+    {
+      newIntersects[index] <- (xStar + xj)/2
+    }
+    
+    #Intersection of the tangent lines at xStar and x_{j+1}
+    if (abs(dhxStar - dhx[index+1]) > 1e-08) #If the tangent values at xStar and x_{j+1} are different
+      newIntersects[index + 1] <- (hx[index+1] - hxStar - xj1*dhx[index+1] + xStar*dhxStar)/(dhxStar - dhx[index+1])
+    else  #If the tangent values at xStar and x_{j+1} are the same
+      newIntersects[index + 1] <- (xStar + xj1)/2
+  }
+  else if (index == 0) #If xStar is being added to the beginning of the abscissae
+  {
+    xj1 <- abscissae[index+1]
+    
+    #Intersection of the tangent lines at xStar and x_{j+1}
+    if (abs(dhxStar - dhx[index+1]) > 1e-08) #If the tangent values at x_{j+1} and xStar are different
+      newIntersects[index + 1] <- (hx[index+1] - hxStar - xj1*dhx[index+1] + xStar*dhxStar)/(dhxStar - dhx[index+1])
+    else #If the tangent values at x_{j+1} and xStar are the same
+      newIntersects[index + 1] <- (xStar + xj1)/2
+  }
+  else #index == k, ie xStar is being added to the end of the abscissae
+  {
+    xj <- abscissae[index]
+    
+    #Intersect of x_j and xStar
+    if (abs(dhx[index] - dhxStar) > 1e-08) #If the tangent values at x_j and xStar are different
+      newIntersects[index] <- (hxStar - hx[index] - xStar*dhxStar + xj*dhx[index])/(dhx[index] - dhxStar)
+    else #If the tangent values at x_j and xStar are the same
+    {
+      newIntersects[index] <- (xStar + xj)/2
+    }
+  }
+  
+  return(newIntersects)
+}
+
 #Given the new abscissae point, xStar, this function will update the vectors
 #hx, dhx and abscissae accordingly
 updateDistVals <- function(abscissae, hx, dhx, xStar, hxStar, dhxStar)
