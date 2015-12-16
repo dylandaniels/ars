@@ -35,7 +35,7 @@ findInitPoints <- function(h, leftbound, rightbound)
     ub <- max(0.01, leftbound)
 
   #If leftbound = -Inf and rightbound = Inf, starting point is 0
-  startPt <- (lb + ub)/2
+  startPt <- 1e-04 + (lb + ub)/2
 
   #Assumption: Left Bound and Right Bound are correctly given!!
   if ( is.infinite(leftbound) && is.infinite(rightbound) )
