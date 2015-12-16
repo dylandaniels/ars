@@ -36,24 +36,18 @@ sampleFromEnvelope <- function (abscissae, z, integrals, u, hx, dhx) {
     t <- t + 1
   }
 
+  if (t == 1) {
+    partSumsVal <- 0
+  } else {
+    partSumsVal <- partSums[t-1]
+  }
 
   # Handle case where h'(x_t) = 0
   if (abs(dhx[t]) < 1e-10) {
-    if (t == 1) {
-      sampledValue <- (unif*partSums[numPoints]) / exp(hx[t]) + z[t]
-    } else {
-      sampledValue <- (unif*partSums[numPoints] - partSums[t - 1]) / exp(hx[t]) + z[t]
-    }
+    sampledValue <- (unif*partSums[numPoints] - partSumsVal) / exp(hx[t]) + z[t]
   } else {
-    # TODO Dylan: clean this up later
-    # partSums <- c(0, partSums)
-    if (t == 1) {
-      sampledValue <- ((log(dhx[t] * ((unif*partSums[numPoints])) + exp(u(z[t])))
-        - hx[t]) / dhx[t]) + abscissae[t]
-    } else {
-      sampledValue <- ((log(dhx[t] * ((unif*partSums[numPoints]) - partSums[t-1]) + exp(u(z[t])))
-                      - hx[t]) / dhx[t]) + abscissae[t]
-    }
+    sampledValue <- ((log(dhx[t] * ((unif*partSums[numPoints]) - partSumsVal) + exp(u(z[t])))
+                    - hx[t]) / dhx[t]) + abscissae[t]
   }
 
   return(sampledValue)
@@ -70,12 +64,13 @@ updateIntegrals <- function (xStar, oldAbscissae, oldIntegrals, newZ, u, dhx) {
     integrals[3:length(integrals)] <- oldIntegrals[2:length(oldIntegrals)]
     integrals[1] <- evaluateIntegral(newZ[1], newZ[2], u, dhx[1])
     integrals[2] <- evaluateIntegral(newZ[2], newZ[3], u, dhx[2])
+
   } else if (i == length(oldAbscissae)) { # on right boundary
     integrals[1:(length(integrals)-2)] <- oldIntegrals[1:(length(oldIntegrals)-1)]
     integrals[length(integrals)-1] <- evaluateIntegral(newZ[length(newZ)-2], newZ[length(newZ)-1], u, dhx[length(newZ)-2])
     integrals[length(integrals)] <- evaluateIntegral(newZ[length(newZ)-1], newZ[length(newZ)], u, dhx[length(newZ)-1])
-  } else {
-    # Interior sample
+
+  } else {  # Interior sample
     if (i > 1) {
       integrals[1:(i-1)] <- oldIntegrals[1:(i-1)]
     }
