@@ -1,4 +1,4 @@
-eps <- 1e-06
+eps <- 1e-04
 
 #This function returns the vector of intersection points of the tangent lines of abscissae.
 #Inputs:
