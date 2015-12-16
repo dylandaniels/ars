@@ -187,7 +187,7 @@ test_that('test the ars functions when input functions are not log-concave', {
 
 test_that('test the ars functions when initial points are not provided',{
   set.seed(123)
-  expect_equal(ars(100,dnorm)[1:3],c(-0.64765020849266242,-0.27306898542344005,2.23055654491791078))
+  expect_equal(ars(100,dnorm,leftbound = -10,rightbound=10)[1:3],c(-0.64761367424818173,-0.27305561111952537,2.23018308774059637))
 })
 
 test_that('test the ars functions when derivtive functions are given',{
