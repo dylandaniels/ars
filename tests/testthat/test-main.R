@@ -1,32 +1,34 @@
 context('normal cases ars fuction tests')
 
-#install.packages('NormalLaplace')
-#library(NormalLaplace)
 
-# ddgamma=function(x)
-# {
-#   return()
-# }
-# ddbeta=function(x)
-# {
-#   return()
-# }
-# ddchisqu=function(x)
-# {
-#
-# }
-# ddextremevalue=function(x)
-# {
-#
-# }
-# ddlaplace=function(x)
-# {
-#
-# }
-# ddweibull=function(x)
-# {
-#
-# }
+
+ ddgamma=Vectorize(function(x,alpha=2,beta=3)
+ {
+   return(beta^alpha/gamma(alpha)*x^(alpha-1)*exp(-beta*x))
+ })
+ ddbeta=Vectorize(function(x,alpha=2,beta=3)
+ {
+   return(x^(alpha-1)*(1-x)^(beta-1)/beta(alpha,beta))
+ })
+ ddchisqu=Vectorize(function(x,k=6)
+ {
+  return(1/(2^(k/2)*gamma(k/2))*x^(k/2-1)*exp(-x/2))
+ })
+ ddextremevalue=Vectorize(function(x,ep=-5,sig=5,mu=1)
+ {
+  return((1+(x-mu)/sig*ep)^(-1/ep))
+ })
+ ddlaplace=Vectorize(function(x,mu=2,b=3)
+ {
+   if(x>=mu)
+  {return (1/(2*b)*exp((mu-x)/b))}
+  if (x<mu)
+{return (1/(2*b)*exp((x-mu)/b))}
+ })
+ ddweibull=Vectorize(function(x,lambda=2,k=3)
+ {
+  return((k/lambda)*(x/lambda)^(k-1)*exp(-(x/lambda)^k))
+ })
 
 test_that('ars() returns the correct output when given distribution is normal(0,1) distribution', {
   set.seed(0)
@@ -60,49 +62,73 @@ test_that('ainline() send the correct information when given distribution is log
   expect_error(ars(n=1000,g=dlogis,initialPoints=c(1,3,12000),leftbound=0,rightbound=12100), 'derivates of initial abscissae could not be evaluted numerically.')
 })
 
-#need to discuss how to import x
 
-# FIX ALL THESE TESTS
-# test_that('ars() returns the correct output when given distribution is  gamma (shape=3,rate=1) distribution', {
-#   set.seed(0)
-#   expect_true(all.equal(ars(n=1000,g=dgamma(x=1,shape=3),initialPoints=c(0.1,0.2,0.3),leftbound=0,rightbound=1)[1:5],c( 0.8822070,0.3266133 ,0.8771935, 0.8648125,0.6002529),tolerance=1e-07))
-# })
 
-# test_that('ars() sends the correct information when given distribution is (shape=3,rate=1) distribution with the case derivates of initial abscissae could not be evaluted numerically.',{
-#   set.seed(0)
-#   expect_error(ars(n=1000,g=dgamma(x=1,shape=3),initialPoints=c(1,3,12000),leftbound=0,rightbound=12100), 'derivates of initial abscissae could not be evaluted numerically.')
-# })
-#
-# test_that('ars() returns the correct output when given distribution is  beta (shape=3,rate=1) distribution', {
-#   set.seed(0)
-#   expect_true(all.equal(ars(n=1000,g=dgamma(x=1,shape=4),initialPoints=c(0.1,0.2,0.3),leftbound=0,rightbound=1)[1:5],c( 0.8822070,0.3266133 ,0.8771935, 0.8648125,0.6002529),tolerance=1e-07))
-# })
-#
-# test_that('ainline() send the correct information when given distribution is beta(shape=3,rate=1) distribution with the case derivates of initial abscissae could not be evaluted numerically.',{
-#   set.seed(0)
-#   expect_error(ars(n=1000,g=dgamma(x=1,shape1=2,shape2=3),initialPoints=c(1,3,12000),leftbound=0,rightbound=12100), 'derivates of initial abscissae could not be evaluted numerically.')
-# })
-#
-# #add chi-squre
-# test_that('ars() returns the correct output when given distribution is  beta (shape=3,rate=1) distribution', {
-#   set.seed(0)
-#   expect_true(all.equal(ars(n=1000,g=dbeta(x=1,,shape1=4,shape2=3),initialPoints=c(0.1,0.2,0.3),leftbound=0,rightbound=1)[1:5],c( 0.8822070,0.3266133 ,0.8771935, 0.8648125,0.6002529),tolerance=1e-07))
-# })
-#
-# test_that('ainline() send the correct information when given distribution is beta(shape=3,rate=1) distribution with the case derivates of initial abscissae could not be evaluted numerically.',{
-#   set.seed(0)
-#   expect_error(ars(n=1000,g=dgamma(x=1,shape1=2,shape2=3),initialPoints=c(1,3,12000),leftbound=0,rightbound=12100), 'derivates of initial abscissae could not be evaluted numerically.')
-# })
+ 
+ test_that('ars() returns the correct output when given distribution is  gamma (alpha=2,beta=3) distribution', {
+   set.seed(0)
+   expect_true(all.equal(ars(n=1000,g=ddgamma,initialPoints=c(0.1,0.2,0.3),leftbound=0,rightbound=1)[1:5],c( 0.9163975,0.3660236,0.8510459,0.8373588,0.5820760),tolerance=1e-07))
+ })
 
-#add extrme value
+ test_that('ars() sends the correct information when given distribution is (alpha=2,beta=3) distribution with the case derivates of initial abscissae could not be evaluted numerically.',{
+   set.seed(0)
+   expect_error(ars(n=1000,g=ddgamma,initialPoints=c(1,3,12000),leftbound=0,rightbound=12100), 'derivates of initial abscissae could not be evaluted numerically.')
+ })
 
-#add laplace
+ test_that('ars() returns the correct output when given distribution is  beta (alpha=2,beta=3) distribution', {
+   set.seed(0)
+   expect_true(all.equal(ars(n=1000,g=ddbeta,initialPoints=c(0.1,0.2,0.3),leftbound=0,rightbound=1)[1:5],c(  0.38658874,0.76139262, 0.48610130, 0.09888136, 0.19441745),tolerance=1e-07))
+ })
 
-#add weibull
-#
+ test_that('ainline() send the correct information when given distribution is beta(alpha=2,beta=3) distribution with the case derivates of initial abscissae could not be evaluted numerically.',{
+   set.seed(0)
+   expect_error(ars(n=1000,g=ddbeta,initialPoints=c(1,3,12000),leftbound=0,rightbound=12100), 'derivates of initial abscissae could not be evaluted numerically.')
+ })
 
-#dgamma
-#gamma(3)
+
+ test_that('ars() returns the correct output when given distribution is  chisqu (df=6) distribution', {
+   set.seed(0)
+   expect_true(all.equal(ars(n=1000,g=ddchisqu,initialPoints=c(0.1,0.2,0.3),leftbound=0,rightbound=1)[1:5],c(0.6693970,0.9609523,0.9566337,0.8423037,0.3733350),tolerance=1e-07))
+ })
+
+ test_that('ainline() send the correct information when given distribution is chisqu(df=6) distribution with the case derivates of initial abscissae could not be evaluted numerically.',{
+   set.seed(0)
+   expect_error(ars(n=1000,g=ddchisqu,initialPoints=c(1,3,12000),leftbound=0,rightbound=12100), 'derivates of initial abscissae could not be evaluted numerically.')
+ })
+
+test_that('ars() returns the correct output when given distribution is extreme value(epsion=-5,sigma=5,mu=1) distribution', {
+  set.seed(0)
+  expect_true(all.equal(ars(n=1000,g=ddextremevalue,initialPoints=c(0.1,0.2,0.3),leftbound=0,rightbound=1)[1:5],c(0.8911069,0.3572684,0.9016454 ,0.8912197,0.6449157),tolerance=1e-07))
+})
+
+test_that('ainline() send the correct information when given distribution is extreme value(epsion=-5,sigma=5,mu=1) distribution with the case derivates of initial abscissae could not be evaluted numerically.',{
+  set.seed(0)
+  expect_error(ars(n=1000,g=ddextremevalue,initialPoints=c(1,3,12000),leftbound=0,rightbound=12100), 'derivates of initial abscissae could not be evaluted numerically.')
+})
+
+test_that('ars() returns the correct output when given distribution is weibull(mu=2,b=3) distribution', {
+  set.seed(0)
+  expect_true(all.equal(ars(n=1000,g=ddweibull,initialPoints=c(0.1,0.2,0.3),leftbound=0,rightbound=1)[1:5],c( 0.6838474, 0.9629708, 0.9588711, 0.8499925, 0.3962677),tolerance=1e-07))
+})
+
+test_that('ainline() send the correct information when given distribution is weibull(mu=2,b=3) distribution with the case derivates of initial abscissae could not be evaluted numerically.',{
+  set.seed(0)
+  expect_error(ars(n=1000,g=ddweibull,initialPoints=c(1,3,12000),leftbound=0,rightbound=12100), 'derivates of initial abscissae could not be evaluted numerically.')
+})
+
+#test_that('ars() returns the correct output when given distribution is exponential(rate=1) distribution', {
+#  set.seed(0)
+#  expect_true(all.equal(ars(n=1000,g=dexp,initialPoints=c(0.1,0.2,0.3),leftbound=0,rightbound=1)[1:5],c( 0.6838474, 0.9629708, 0.9588711, 0.8499925, 0.3962677),tolerance=1e-07))
+#})
+
+#test_that('ainline() send the correct information when given distribution is exponential(rate=1) distribution with the case derivates of initial abscissae could not be evaluted numerically.',{
+#  set.seed(0)
+#  expect_error(ars(n=1000,g=dexp,initialPoints=c(1,3,12000),leftbound=0,rightbound=12100), 'derivates of initial abscissae could not be evaluted numerically.')
+#})
+
+
+
+
 
 #context('test the ars function for abnormal input functions')
 
