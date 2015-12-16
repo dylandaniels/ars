@@ -64,7 +64,7 @@ test_that('ainline() send the correct information when given distribution is log
 
 
 
- 
+
  test_that('ars() returns the correct output when given distribution is  gamma (alpha=2,beta=3) distribution', {
    set.seed(0)
    expect_true(all.equal(ars(n=1000,g=ddgamma,initialPoints=c(0.1,0.2,0.3),leftbound=0,rightbound=1)[1:5],c( 0.9163975,0.3660236,0.8510459,0.8373588,0.5820760),tolerance=1e-07))
@@ -183,4 +183,22 @@ test_that('test the ars functions when input functions are not log-concave', {
   expect_error(ars(100,myfun,initialPoints = c(4,6),leftbound = 0,rightbound = 10),
                "The sampling function failed the log-concavity test. The derivative vector is not non-increasing within the numeric threshold."
   )
+})
+
+test_that('test the ars functions when initial points are not provided',{
+  set.seed(123)
+  expect_equal(ars(100,dnorm)[1:3],c(-0.64765020849266242,-0.27306898542344005,2.23055654491791078))
+})
+
+test_that('test the ars functions when derivtive functions are given',{
+  set.seed(123)
+  derivX <- function(x){
+    if(x>=0 && x<=1)return(1)
+    if(x>1 && x<=2)return(-1)
+  }
+  myfun <- function(x){
+    if (x>=0 && x<=1) return(x)
+    if (x>1 && x<=2) return(2-x)
+  }
+  expect_equal(ars(100,myfun,dg = derivX,leftbound = 0,rightbound = 2)[1:3],c(1.11236707972281512,0.93374402364032161,1.81458526158709388))
 })
