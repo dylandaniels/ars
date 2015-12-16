@@ -1,4 +1,4 @@
-Mainline2 <- function(n, g, dg=NULL, initialPoints=NULL, leftbound=-Inf, rightbound=Inf) {
+Mainline <- function(n, g, dg=NULL, initialPoints=NULL, leftbound=-Inf, rightbound=Inf) {
 
   abscissae <- initialPoints
 
