@@ -64,7 +64,7 @@ test_that('ainline() send the correct information when given distribution is log
 
 
 
- 
+
  test_that('ars() returns the correct output when given distribution is  gamma (alpha=2,beta=3) distribution', {
    set.seed(0)
    expect_true(all.equal(ars(n=1000,g=ddgamma,initialPoints=c(0.1,0.2,0.3),leftbound=0,rightbound=1)[1:5],c( 0.9163975,0.3660236,0.8510459,0.8373588,0.5820760),tolerance=1e-07))
@@ -116,15 +116,15 @@ test_that('ainline() send the correct information when given distribution is wei
   expect_error(ars(n=1000,g=ddweibull,initialPoints=c(1,3,12000),leftbound=0,rightbound=12100), 'derivates of initial abscissae could not be evaluted numerically.')
 })
 
-#test_that('ars() returns the correct output when given distribution is exponential(rate=1) distribution', {
-#  set.seed(0)
-#  expect_true(all.equal(ars(n=1000,g=dexp,initialPoints=c(0.1,0.2,0.3),leftbound=0,rightbound=1)[1:5],c( 0.6838474, 0.9629708, 0.9588711, 0.8499925, 0.3962677),tolerance=1e-07))
-#})
+test_that('ars() returns the correct output when given distribution is exponential(rate=1) distribution', {
+  set.seed(0)
+  expect_true(all.equal(ars(n=1000,g=dexp,initialPoints=c(0.1,0.2,0.3),leftbound=0,rightbound=1)[1:5],c( 0.8366036,0.2681764,0.8535432,0.8390765,0.5407761),tolerance=1e-07))
+})
 
-#test_that('ainline() send the correct information when given distribution is exponential(rate=1) distribution with the case derivates of initial abscissae could not be evaluted numerically.',{
-#  set.seed(0)
-#  expect_error(ars(n=1000,g=dexp,initialPoints=c(1,3,12000),leftbound=0,rightbound=12100), 'derivates of initial abscissae could not be evaluted numerically.')
-#})
+test_that('ainline() send the correct information when given distribution is exponential(rate=1) distribution with the case derivates of initial abscissae could not be evaluted numerically.',{
+  set.seed(0)
+  expect_error(ars(n=1000,g=dexp,initialPoints=c(1,3,12000),leftbound=0,rightbound=12100), 'derivates of initial abscissae could not be evaluted numerically.')
+})
 
 
 
