@@ -1,3 +1,4 @@
+#' @export
 ars <- function(n, g, dg=NULL, initialPoints=NULL, leftbound=-Inf, rightbound=Inf, showPlot=FALSE) {
 
   abscissae <- initialPoints
