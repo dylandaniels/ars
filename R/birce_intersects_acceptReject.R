@@ -160,15 +160,7 @@ envelopeIntersectPoints <- function ( abscissae, hx, dhx )
     {
       #For the points where the denominator is not equal to zero
       intersects[-zeros] <- numerator[-zeros]/denominator[-zeros]
-
-      for (i in 1:length(zeros))
-      {
-        index <- zeros[i]
-        if (index != 1)
-          intersects[index] <- intersects[index-1]
-        else
-          intersects[index] <- min(abscissae)
-      }
+      intersects[zeros] <- (abscissae[zeros+1] + abscissae[zeros])/2
     }
     else #If none of the differences are equal to zero.
     {
