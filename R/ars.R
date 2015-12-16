@@ -1,5 +1,54 @@
+#' Adaptive Rejection Sampling
+#'
+#' Generate samples from a distribution via the adapative rejection sampling algorithm. Adaptive rejection
+#' sampling dynamically builds a ``rejection region,'' so that the user does not need to explicitly supply one.
+#'
+#' @param n Number of samples.
+#' @param g (Unnormalized) density function to sample from. \code{g} must be (non-strictly) log-concave.
+#' @param dg Derivative of the density function. If not supplied, numeric differentiation is attempted.
+#' @param initialPoints A vector of the initial abscissae to generate the envelope and squeezing functions.
+#'  If not supplied, an optimization routine will attempt to find initial points.
+#' @param leftbound The lower bound of \code{g}.
+#' @param rightbound The upper bound of \code{g}.
+#'
+#' @details
+#' The function \code{g} must be an log-concave (unnormalized) density function. Accurate \code{leftbound}
+#' \code{rightbound} values must also be supplied.
+#'
+#' The \code{initialPoints} are used to construct
+#' the envelope and squeezing functions described in the paper (Gilks & Wild, 1992) below. If
+#' not supplied, an algorithm is run which attempts to find the mode of \code{g} and generates
+#' initial points near the mode. If the user wishes to supply initial points (recommended),
+#' at least initial point must be given where the derivative of \code{g} is less than zero, and
+#' another where the derivative of \code{g} is greater than zero, unless the function is monotonic.
+#'
+#' @return Returns a vector of \code{n} samples from \code{g}.
+#'
+#' @references
+#' Gilks, W. R., & Wild, P. (1992). Adaptive rejection sampling for Gibbs sampling.
+#' \emph{Applied Statistics}, 337-348.
+#'
+#' @examples
+#' # Sample 10 points from Normal(0,1)
+#' ars(10, dnorm, initialPoints=c(-1,1))
+#'
+#' # Sample 15 points from Uniform[0,1]
+#' ars(15, dunif, initialPoints=c(0.2, 0.3, 0.8), leftbound=0, rightbound=1)
+#'
+#' # Define a quadratic distribution
+#' f <- function (x) {
+#'  return(x^2)
+#' }
+#'
+#' df <- function (x) {
+#'  return(2 * x)
+#' }
+#'
+#' # Sample 5 points from a quadratic distribution
+#' # Note that ars() takes care of normalization
+#' ars(5, f, df, initialPoints = c(1,2), leftbound=0, rightbound=10)
 #' @export
-ars <- function(n, g, dg=NULL, initialPoints=NULL, leftbound=-Inf, rightbound=Inf, showPlot=FALSE) {
+ars <- function(n, g, dg=NULL, initialPoints=NULL, leftbound=-Inf, rightbound=Inf) {
 
   abscissae <- initialPoints
 
@@ -90,15 +139,6 @@ ars <- function(n, g, dg=NULL, initialPoints=NULL, leftbound=-Inf, rightbound=In
       samples[i] <- xstar
     }
   }
-
-  if (showPlot) {
-    x <- seq(0,5,0.01)
-    u <- Vectorize(u)
-    l <- Vectorize(l)
-    plot(x, exp(u(x)), type='l')
-    points(x, exp(l(x)), col='blue',type='l')
-  }
-
 
   return (samples)
 }
