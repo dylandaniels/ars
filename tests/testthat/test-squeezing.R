@@ -1,4 +1,4 @@
-
+context('squeezing function tests')
 
 test_that('squeezing() returns the correct output when given value is not in the scope of hx', {
   abs=c(0,1,2) # mock abscessae points
@@ -15,5 +15,5 @@ test_that("squeeing() returns the correct output when given values is in the sco
   expect_equal(squeezing(hx,abs,x1),1.9)
   expect_equal(squeezing(hx,abs,x2),5.4)
   expect_equal(squeezing(hx,abs,x3),4)
-  
+
 })

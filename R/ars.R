@@ -1,100 +1,103 @@
-# lb - lower bound
-# ub - upper bound
-# u - envelope function
-# dhx
-evaluateIntegral <- function (lb, ub, u, dhx) {
-  if (abs(dhx) < 1e-10) {
-    return(exp(u(ub))*(ub - lb))
-  } else {
-    return((exp(u(ub)) - exp(u(lb))) / dhx)
-  }
-}
+ars <- function(n, g, dg=NULL, initialPoints=NULL, leftbound=-Inf, rightbound=Inf, showPlot=FALSE) {
 
-# z - intersection points of envelope function (Note that z[1] may be -Inf, and z[length(z)] may be Inf)
-# u - envelope function (u(Inf) and u(-Inf) must be valid calls, both should return 0)
-# dhx - vector h'(x) evaluted at each of the abscissae
-calculateInitialIntegrals <- function (z, u, dhx) {
-  # the evaluated integrals of the envelope function between z[j-1] and z[j] (for each j)
-  integrals <- numeric(length(dhx))
+  abscissae <- initialPoints
 
-  for (i in 1:length(dhx)) {
-    integrals[i] <- evaluateIntegral(z[i], z[i+1], u, dhx[i])
+  h <- function (y) {
+    return(log(g(y)))
   }
 
-  return(integrals)
-}
-
-# Is this function needed??
-# This is the function s_k(x) described in the paper
-# u - envelope function
-normalizedEnvelope <- function (x, u, abscissae, z, derivH) {
-  numPoints <- length(abscissae)
-  return(exp(u(x))/(partialSums(abscissae, z, u, derivH)[numPoints]))
-}
-
-sampleFromEnvelope <- function (abscissae, z, integrals, u, hx, dhx) {
-  unif <- runif(1)
-  numPoints <- length(abscissae)
-  partSums <- cumsum(integrals)
-  normalizedPartSums <-partSums/partSums[numPoints]
-
-  # Find the value t s.t. normalizedPartSums[t - 1] < u < normalizedPartSums[t]
-  t <- 1
-  while (unif > normalizedPartSums[t]) {
-    t <- t + 1
-  }
-
-
-  # Handle case where h'(x_t) = 0
-  if (abs(dhx[t]) < 1e-10) {
-    if (t == 1) {
-      sampledValue <- (unif*partSums[numPoints]) / exp(hx[t]) + z[t]
-    } else {
-      sampledValue <- (unif*partSums[numPoints] - partSums[t - 1]) / exp(hx[t]) + z[t]
+  if (is.null(dg)) {
+    h_der <- function (y) {
+      # Look into replacing this with grad() function?
+      derivatives <- sapply(y, function (x) {
+        env <- new.env()
+        assign('x', x, envir = env)
+        result = tryCatch({
+          diag(attributes(numericDeriv(quote(h(x)), 'x', env))$gradient)
+        }, error = function(e) {
+          stop('derivates of initial abscissae could not be evaluted numerically.')
+        })
+        return(result)
+      })
+      return(derivatives)
     }
   } else {
-    # TODO Dylan: clean this up later
-    # partSums <- c(0, partSums)
-    if (t == 1) {
-      sampledValue <- ((log(dhx[t] * ((unif*partSums[numPoints])) + exp(u(z[t])))
-        - hx[t]) / dhx[t]) + abscissae[t]
-    } else {
-      sampledValue <- ((log(dhx[t] * ((unif*partSums[numPoints]) - partSums[t-1]) + exp(u(z[t])))
-                      - hx[t]) / dhx[t]) + abscissae[t]
+    h_der <- convertDerivToLog(g, dg)
+  }
+
+  #If the user does not provide the initial points, then run the
+  #findInitPoints function
+  if (is.null(initialPoints)) {
+    abscissae <- findInitPoints(h, leftbound, rightbound)
+    message(paste(c('No initial points given by user. Guessing initial points:', abscissae), collapse=" "))
+  }
+
+
+  abscissae = sort(abscissae)
+  hx <- h(abscissae)
+  dhx <- h_der(abscissae)
+  precheck(abscissae, dhx, leftbound, rightbound)
+
+  # TODO Refactor all of the following checks into one function?
+
+  z <- envelopeIntersectPoints(abscissae, hx, dhx)
+  z <- c(leftbound, z, rightbound)
+
+  i <- 0
+  samples <- numeric(n)
+
+  integrals <- NULL
+
+  u <- Vectorize(function (x) {
+    return(envelope(z, abscissae, x, hx, dhx))
+  })
+
+  l <- function (x) {
+    return(squeezing(hx, abscissae, x))
+  }
+
+  while (i < n) {
+
+    if (is.null(integrals)) {
+      integrals <- calculateInitialIntegrals(z, u, dhx)
+    }
+
+    xstar <- sampleFromEnvelope(abscissae, z, integrals, u, hx, dhx)
+    result <- acceptReject(xstar, l, u, h, h_der)
+    if (result$step == 2) {
+      z <- updateIntersects(abscissae, z, hx, dhx, xstar, result$hx, result$dhx)
+      z <- c(leftbound, z, rightbound)
+
+      newValues <- updateDistVals(abscissae, hx, dhx, xstar, result$hx, result$dhx)
+      hx <- newValues$hx
+      dhx <- newValues$dhx
+      oldAbscissae <- abscissae
+      abscissae <- newValues$abscissae
+
+      u <- function (x) {
+        return(envelope(z, abscissae, x, hx, dhx))
+      }
+
+      l <- function (x) {
+        return(squeezing(hx, abscissae, x))
+      }
+
+      integrals <- updateIntegrals(xstar, oldAbscissae, integrals, z, u, dhx)
+    }
+    if (result$dec) {
+      i <- i + 1
+      samples[i] <- xstar
     }
   }
 
-  return(sampledValue)
-}
-
-
-updateIntegrals <- function (xStar, oldAbscissae, oldIntegrals, newZ, u, dhx) {
-  # Find index i where oldAbscissae[i] <= xStar <= oldAbscissae[i+1]
-  i <- sum(oldAbscissae <= xStar)
-
-  integrals <- numeric(length(dhx))
-
-  if (i == 0) { # on left boundary
-    integrals[3:length(integrals)] <- oldIntegrals[2:length(oldIntegrals)]
-    integrals[1] <- evaluateIntegral(newZ[1], newZ[2], u, dhx[1])
-    integrals[2] <- evaluateIntegral(newZ[2], newZ[3], u, dhx[2])
-  } else if (i == length(oldAbscissae)) { # on right boundary
-    integrals[1:(length(integrals)-2)] <- oldIntegrals[1:(length(oldIntegrals)-1)]
-    integrals[length(integrals)-1] <- evaluateIntegral(newZ[length(newZ)-2], newZ[length(newZ)-1], u, dhx[length(newZ)-2])
-    integrals[length(integrals)] <- evaluateIntegral(newZ[length(newZ)-1], newZ[length(newZ)], u, dhx[length(newZ)-1])
-  } else {
-    # Interior sample
-    if (i > 1) {
-      integrals[1:(i-1)] <- oldIntegrals[1:(i-1)]
-    }
-    if (i < length(oldIntegrals) - 1) {
-      integrals[(i+3):length(integrals)] <- oldIntegrals[(i+2):length(oldIntegrals)]
-    }
-    for (j in 0:2) {
-      integrals[i+j] <- evaluateIntegral(newZ[i+j], newZ[i+j+1], u, dhx[i+j])
-    }
+  if (showPlot) {
+    x <- seq(0,5,0.01)
+    u <- Vectorize(u)
+    l <- Vectorize(l)
+    plot(x, exp(u(x)), type='l')
+    points(x, exp(l(x)), col='blue',type='l')
   }
-  return(integrals)
+
+
+  return (samples)
 }
-
-

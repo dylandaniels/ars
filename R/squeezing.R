@@ -14,6 +14,3 @@ squeezing=function(hx,abscissae,x){
   }
 }
 
-
-
-
