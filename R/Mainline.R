@@ -1,4 +1,4 @@
-Mainline <- function(n, g, dg=NULL, initialPoints=NULL, leftbound=-Inf, rightbound=Inf) {
+Mainline <- function(n, g, dg=NULL, initialPoints=NULL, leftbound=-Inf, rightbound=Inf, showPlot=FALSE) {
 
   abscissae <- initialPoints
 
@@ -29,15 +29,14 @@ Mainline <- function(n, g, dg=NULL, initialPoints=NULL, leftbound=-Inf, rightbou
   #findInitPoints function
   if (is.null(initialPoints))
     abscissae <- findInitPoints(h, leftbound, rightbound)
+    message(paste(c('No initial points given by user. Guessing initial points:', abscissae), collapse=" "))
+
+
 
   abscissae = sort(abscissae)
   hx <- h(abscissae)
   dhx <- h_der(abscissae)
   precheck(abscissae, dhx, leftbound, rightbound)
-  # TODO: put in checks for abscissae
-  # (1) uniqueness
-  # (2) number of abscissae is greater than 2
-  # (3) first and last are at h'(x_1) < 0 and h'(x_k) > 0, respectively.
 
   # TODO Refactor all of the following checks into one function?
 
@@ -76,9 +75,9 @@ Mainline <- function(n, g, dg=NULL, initialPoints=NULL, leftbound=-Inf, rightbou
       z <- c(leftbound, z, rightbound)
 
 
-      u <- Vectorize(function (x) {
+      u <- function (x) {
         return(envelope(z, abscissae, x, hx, dhx))
-      })
+      }
 
       l <- function (x) {
         return(squeezing(hx, abscissae, x))
@@ -92,11 +91,14 @@ Mainline <- function(n, g, dg=NULL, initialPoints=NULL, leftbound=-Inf, rightbou
     }
   }
 
-  # Uncomment to plot
-#   x <- seq(0,5,0.01)
-#   plot(x, exp(u(x)), type='l')
-#   l <- Vectorize(l)
-#   points(x, exp(l(x)), col='red',type='l')
+  if (showPlot) {
+    x <- seq(0,5,0.01)
+    u <- Vectorize(u)
+    l <- Vectorize(l)
+    plot(x, exp(u(x)), type='l')
+    points(x, exp(l(x)), col='blue',type='l')
+  }
+
 
   return (samples)
 }
