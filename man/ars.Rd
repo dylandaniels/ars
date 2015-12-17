@@ -29,7 +29,7 @@ Generate samples from a distribution via the adapative rejection sampling algori
 sampling dynamically builds a ``rejection region,'' so that the user does not need to explicitly supply one.
 }
 \details{
-The function \code{g} must be an log-concave (unnormalized) density function. Accurate \code{leftbound}
+The function \code{g} must be a log-concave, continuous and differentiable (unnormalized) density function. Accurate \code{leftbound}
 \code{rightbound} values must also be supplied.
 
 The \code{initialPoints} are used to construct
@@ -37,7 +37,7 @@ the envelope and squeezing functions described in the paper (Gilks & Wild, 1992)
 not supplied, an algorithm is run which attempts to find the mode of \code{g} and generates
 initial points near the mode. If the user wishes to supply initial points (recommended),
 at least one initial point must be given where the derivative of \code{g} is less than zero, and
-another where the derivative of \code{g} is greater than zero, unless the function is monotonic.
+another where the derivative of \code{g} is greater than zero, unless the function is monotonic. Moreover, the value of the function \code{g} at these points must have finite values.
 }
 \examples{
 # Sample 10 points from Normal(0,1)
