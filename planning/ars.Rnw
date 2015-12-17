@@ -48,7 +48,7 @@ S_k^{-1}(U) = \frac{\log\left(h'(x_t) (\frac{U}{c} - \text{\texttt{partialSums[t
 $$
 
 \subsection*{Testing}
-blah
+We have written unit tests for each individual helper function, as well as test for our main \texttt{ars()} function.
 
 \subsection*{Contributions}
 Jiang Zhu has written the squeezing function, the precheck function and some part of the ars function.Jiang Zhu has also written the test for squeezing function,precheck function and the common cases of the ars function.
