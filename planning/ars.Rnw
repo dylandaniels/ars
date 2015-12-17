@@ -53,6 +53,9 @@ blah
 \subsection*{Contributions}
 Jiang Zhu has written the squeezing function, the precheck function and some part of the ars function.Jiang Zhu has also written the test for squeezing function,precheck function and the common cases of the ars function.
 
-blah
+\subsection*{Contributions}
+Tian Xia has written the envelope funciton, returning the value evaluated by the u_k(x), test code for testing envelope function, intersects function, update function and part test code of the main function under some abnormal input functions.
+
+
 
 \end{document}
