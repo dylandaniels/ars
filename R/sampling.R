@@ -1,7 +1,8 @@
+# Evaluates an individual integral between two intersection points
 # lb - lower bound
 # ub - upper bound
 # u - envelope function
-# dhx
+# dhx - the value of the h'(x) where x is the abscissae
 evaluateIntegral <- function (lb, ub, u, dhx) {
   if (abs(dhx) < 1e-10) {
     return(exp(u(ub))*(ub - lb))
@@ -10,6 +11,7 @@ evaluateIntegral <- function (lb, ub, u, dhx) {
   }
 }
 
+# Calculates the values of the integrals used for the sampling function initially
 # z - intersection points of envelope function (Note that z[1] may be -Inf, and z[length(z)] may be Inf)
 # u - envelope function (u(Inf) and u(-Inf) must be valid calls, both should return 0)
 # dhx - vector h'(x) evaluted at each of the abscissae
@@ -24,6 +26,11 @@ calculateInitialIntegrals <- function (z, u, dhx) {
   return(integrals)
 }
 
+# Samples a new value from the envelope function
+# abscissae - abscissae
+# z - intersection points
+# integrals - the integrated values between each pair of intersection points
+# u - envelope function
 sampleFromEnvelope <- function (abscissae, z, integrals, u, hx, dhx) {
   unif <- runif(1)
   numPoints <- length(abscissae)
@@ -54,6 +61,13 @@ sampleFromEnvelope <- function (abscissae, z, integrals, u, hx, dhx) {
 }
 
 
+# Updates the integrals when a new value is evaluated.
+# xStar - newly evaluated point
+# oldAbscissae - abscissae from last step
+# oldIntegrals - integrals from last step
+# newZ - new intersection points
+# u - envelope function
+# dhx - h'(x) evaluated at new abscissae
 updateIntegrals <- function (xStar, oldAbscissae, oldIntegrals, newZ, u, dhx) {
   # Find index i where oldAbscissae[i] <= xStar <= oldAbscissae[i+1]
   i <- sum(oldAbscissae <= xStar)
@@ -85,12 +99,13 @@ updateIntegrals <- function (xStar, oldAbscissae, oldIntegrals, newZ, u, dhx) {
 }
 
 
-#xStar is a point sampled from s_k(x) function
-#lowerFun is the l_k(x) function
-#upperFun is the u_k(x) function
-#logDistFun is h(x) = ln( g(x) ) function
-#Returns TRUE if xStar is ACCEPTED
-#Returns FALSE if xStar is REJECTED
+# Accepts/rejects a candidate point xStar
+# xStar is a point sampled from s_k(x) function
+# lowerFun is the l_k(x) function
+# upperFun is the u_k(x) function
+# logDistFun is h(x) = ln( g(x) ) function
+# Returns TRUE if xStar is ACCEPTED
+# Returns FALSE if xStar is REJECTED
 acceptReject <- function (xStar, lowerFun, upperFun, logDistFun, logDistDerivFun)
 {
   #A random uniform(0,1) value

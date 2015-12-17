@@ -17,9 +17,9 @@ ars(n, g, dg = NULL, initialPoints = NULL, leftbound = -Inf,
 \item{initialPoints}{A vector of the initial abscissae to generate the envelope and squeezing functions.
 If not supplied, an optimization routine will attempt to find initial points.}
 
-\item{leftbound}{The lower bound of \code{g}.}
+\item{leftbound}{The lower bound of the domain of \code{g}.}
 
-\item{rightbound}{The upper bound of \code{g}.}
+\item{rightbound}{The upper bound of the domain of \code{g}.}
 }
 \value{
 Returns a vector of \code{n} samples from \code{g}.
@@ -36,7 +36,7 @@ The \code{initialPoints} are used to construct
 the envelope and squeezing functions described in the paper (Gilks & Wild, 1992) below. If
 not supplied, an algorithm is run which attempts to find the mode of \code{g} and generates
 initial points near the mode. If the user wishes to supply initial points (recommended),
-at least initial point must be given where the derivative of \code{g} is less than zero, and
+at least one initial point must be given where the derivative of \code{g} is less than zero, and
 another where the derivative of \code{g} is greater than zero, unless the function is monotonic.
 }
 \examples{
