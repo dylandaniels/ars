@@ -51,6 +51,8 @@ $$
 blah
 
 \subsection*{Contributions}
+Jiang Zhu has written the squeezing function, the precheck function and some part of the ars function.Jiang Zhu has also written the test for squeezing function,precheck function and the common cases of the ars function.
+
 blah
 
 \end{document}
