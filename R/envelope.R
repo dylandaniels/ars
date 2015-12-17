@@ -1,8 +1,6 @@
-
-#this 'envelope' function works to output the value of u_k(x), which is the upper hull function when exponentiated and
-#normalized. This function takes inputs of z(the intersection points), abscissae, the x value to be evaluated, hx(the
-#log function value of the abscissae) and dhx(derivative values of log function).
-
+# This 'envelope' function works to output the value of u_k(x), which is the upper hull function when exponentiated and
+# normalized. This function takes inputs of z(the intersection points), abscissae, the x value to be evaluated, hx(the
+# log function value of the abscissae) and dhx(derivative values of log function).
 envelope <- function(z, abscissae, x, hx, dhx) {
   #Here, 'index' determines which piecewise function will be used to evaluate u_k(x)
   #if the 'x' equals to last element of 'z', then the index will be length of 'z' minus
