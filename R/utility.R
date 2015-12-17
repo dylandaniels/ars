@@ -49,7 +49,7 @@ findInitPoints <- function(h, leftbound, rightbound)
   else #If there are finite bounds at either left or right sides
   {
    tryCatch(
-      { sol <- optimx(startPt, negh, method = "L-BFGS-B", lower = leftbound, upper = rightbound)
+      { sol <- optimx::optimx(startPt, negh, method = "L-BFGS-B", lower = leftbound, upper = rightbound)
       modeVal <- sol[1,1] },
       error = function(e) { stop("Unable to guess initial points. Please provide them manually.") },
       warning = function(w) { stop("Unable to guess initial points. Please provide them manually.") })

@@ -7,3 +7,4 @@ Depends: R (>= 3.2.2)
 License: What license is it under?
 LazyData: true
 Suggests: testthat
+Imports: optimx
