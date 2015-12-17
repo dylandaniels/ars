@@ -58,7 +58,6 @@ ars <- function(n, g, dg=NULL, initialPoints=NULL, leftbound=-Inf, rightbound=In
 
   if (is.null(dg)) {
     h_der <- function (y) {
-      # Look into replacing this with grad() function?
       derivatives <- sapply(y, function (x) {
         env <- new.env()
         assign('x', x, envir = env)
@@ -87,8 +86,6 @@ ars <- function(n, g, dg=NULL, initialPoints=NULL, leftbound=-Inf, rightbound=In
   hx <- h(abscissae)
   dhx <- h_der(abscissae)
   precheck(abscissae, dhx, leftbound, rightbound)
-
-  # TODO Refactor all of the following checks into one function?
 
   z <- envelopeIntersectPoints(abscissae, hx, dhx)
   z <- c(leftbound, z, rightbound)
