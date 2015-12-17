@@ -70,18 +70,18 @@ findInitPoints <- function(h, leftbound, rightbound)
     if( is.infinite(leftbound) )
       initAbs[1] <- modeVal - 1
     else
-      initAbs[1] <- (leftbound + modeVal)/10
+      initAbs[1] <- (0.2*leftbound + 0.8*modeVal)
 
     #If right bound is infinity
     if (is.infinite(rightbound))
       initAbs[3] <- modeVal + 1
     else
-      initAbs[3] <- (rightbound + modeVal)/10
+      initAbs[3] <- (0.2*rightbound + 0.8*modeVal)
   }
   else #Both bounds are finite
   {
-    initAbs[1] <- (leftbound + modeVal)/10
-    initAbs[3] <- (rightbound + modeVal)/10
+    initAbs[1] <- (0.2*leftbound + 0.8*modeVal)
+    initAbs[3] <- (0.2*rightbound + 0.8*modeVal)
   }
 
   #We will check for uniqueness here because either the leftbound
