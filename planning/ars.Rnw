@@ -1,0 +1,24 @@
+\documentclass{article}
+\usepackage{titling}
+\usepackage[margin=1.25in]{geometry}
+\usepackage{amsmath}
+\usepackage{hyperref}
+
+\setlength{\droptitle}{-10em}
+\author{Dylan Daniels, Jiang Zhu, Tian Xia, Birce Tezel}
+\title{ARS Final Project \\ \url{github.com/dylandaniels/ars}}
+
+\begin{document}
+
+\maketitle
+
+\subsection*{Implementation}
+The core part of the algorithm is implemented in the \texttt{ars()} function; helper functions are implemented in small, modular components. The more complicated part of the algorithm involves sampling from the distribution $s_k(x) = u_k(x) / \int_D u_k(x') dx' = c \ u_k(x)$. First we need to find the normalizing constant $c := 1 / \int_D u_k(x') dx':$
+
+\subsection*{Testing}
+blah
+
+\subsection*{Contributions}
+blah
+
+\end{document}
