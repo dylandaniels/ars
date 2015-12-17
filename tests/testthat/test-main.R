@@ -186,11 +186,13 @@ test_that('test the ars functions when input functions are not log-concave', {
 })
 
 test_that('test the ars functions when initial points are not provided',{
+  library(optimx)
   set.seed(123)
   expect_equal(ars(100,dnorm,leftbound = -10,rightbound=10)[1:3],c(-0.64761367424818173,-0.27305561111952537,2.23018308774059637))
 })
 
 test_that('test the ars functions when derivtive functions are given',{
+  library(optimx)
   set.seed(123)
   derivX <- function(x){
     if(x>=0 && x<=1)return(1)
