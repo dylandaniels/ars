@@ -1,9 +1,7 @@
-#***********document*********************************************************
-#This function is used to test whether the abscissae satisfies preliminary requirements.
-#we import dhx,abscissae leftbound and rightbound and returns different imformation if
-#the abscissae doesn't satisfies different requirements.And it will return no message if
-#the abscissae is OK.
-#*****************************************************************************
+# This function is used to test whether the abscissae satisfies preliminary requirements.
+# we import dhx,abscissae leftbound and rightbound and returns different imformation if
+# the abscissae doesn't satisfies different requirements.And it will return no message if
+# the abscissae is OK.
 precheck <- function(abscissae, dhx, leftbound, rightbound){
   if (length(unique(abscissae)) != length(abscissae)) {
     stop('Elements of abscissae should be unique')

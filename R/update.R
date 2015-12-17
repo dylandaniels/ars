@@ -1,5 +1,5 @@
-#Given the new abscissae point, xStar, this function will update the vectors
-#hx, dhx and abscissae accordingly
+# Given the new abscissae point, xStar, this function will update the vectors
+# hx, dhx and abscissae accordingly
 updateDistVals <- function(abscissae, hx, dhx, xStar, hxStar, dhxStar)
 {
   leq <- (abscissae <= xStar)

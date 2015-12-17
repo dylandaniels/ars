@@ -156,11 +156,12 @@ print(ks.test(samples,ppchisq)$p.value)
 
 
 \subsection*{Contributions}
-Jiang Zhu has written the squeezing function, the precheck function and some part of the ars function. Jiang Zhu has also written the test for squeezing function, precheck function and the common cases of the ars function.
+Jiang Zhu wrote the squeezing function, the precheck function and some part of the ars function. Jiang Zhu also wrote tests for squeezing function, precheck function and for common cases of the ars function.
 
-Tian Xia has written the envelope funciton, returning the value evaluated by the $u_k(x)$, test code for testing envelope function, intersects function, update function and part test code of the main function under some abnormal input functions.
+Tian Xia wrote the envelope funciton, returning the value evaluated by the $u_k(x)$, test code for testing envelope function, intersects function, update function and part of the test code of the main function under some abnormal input functions.
 
-Birce wrote the codes for finding initial set of abscissae points if not provided by the user, finding and updating the intersection points of the envelope function, updating abscissae and vectors \texttt{hx} and \texttt{dhx} and finally the accept/reject function that takes returns the decision regarding a new sampled point.
+Birce wrote the code for finding initial set of abscissae points if not provided by the user, finding and updating the intersection points of the envelope function, updating abscissae and vectors \texttt{hx} and \texttt{dhx} and finally the accept/reject function that takes returns the decision regarding a new sampled point.
 
+Dylan Daniels wrote the code for sampling from the envelope function, including its tests. In addition, he spearheaded the auxiliary tasks, such as setting up the git repo and creating the package.
 
 \end{document}
