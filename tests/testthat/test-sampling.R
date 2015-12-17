@@ -43,3 +43,16 @@ test_that("updateIntegrals() picks correct integrals to update", {
   expect_equal(sum(updatedIntegrals[5:6] != dummyValue), 2)
   expect_equal(sum(updatedIntegrals[1:4] == dummyValue), 4)
 })
+
+test_that('acceptReject() accepts when appropriate and generates correct values', {
+  xStar <- 5
+  lowerFun <- function (x) { x }
+  upperFun <- function (x) { x }
+  logDistFun <- function (x) { log(x) }
+  logDistDerivFun <- function (x) { 1 / x }
+  result <- acceptReject(xStar, lowerFun, upperFun, logDistFun, logDistDerivFun)
+  expect_true(result$dec)
+  expect_identical(result$step, 1)
+  expect_null(result$dhx)
+  expect_null(result$hx)
+})
