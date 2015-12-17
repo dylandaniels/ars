@@ -21,10 +21,10 @@ $$
 $$
 
 where $$I_j := \int_{z_{j-1}}^{z_j} \exp(h(x_j) + (x' - x_j) h'(x_j)) dx'.$$ Notice that the explicit form of $I_j$ depends on whether $h'(x_j)=0$ or not. Therefore we have,
-$$ I_j = \begin{cases} 
-	(z_j-z_{j-1}) \exp (h(x_j)) \quad \text{if} \quad h'(x_j) = 0, \vspace{2mm} \\ 
+$$ I_j = \begin{cases}
+	(z_j-z_{j-1}) \exp (h(x_j)) \quad \text{if} \quad h'(x_j) = 0, \vspace{2mm} \\
 	\frac{\exp u_k(z_j)  - \exp u_k(z_{j-1}) }{h'(x_j)} \quad \text{otherwise}.
-	\end{cases} $$ 
+	\end{cases} $$
 
 Next, in order to use the inverse CDF method for sampling, we must find the CDF for $s_k(x)$, $S_k(x) = c \int_{z_0}^x u_k(x') dx'$:
 
@@ -36,9 +36,9 @@ $$
 $$
 S_k(x) = c \left(\text{\texttt{partialSums[t-1]}} + J_{t-1}(x) \right),
 $$
-where 
+where
 $$
-J_{t-1}(x) = \begin{cases} 
+J_{t-1}(x) = \begin{cases}
 	\exp\big(h(x_t)\big)(x-z_{t-1}) \quad \text{if} \quad h'(x_t) = 0, \vspace{2mm}\\
  	\frac{\exp u_k(x) - \exp u_k(z_{t-1})}{h'(x_t)} \quad \text{otherwise}.
  \end{cases}
@@ -56,15 +56,18 @@ $$
 
 
 \subsection*{Testing}
-We have written unit tests for each individual helper function, as well as test for our main \texttt{ars()} function.
+We have written unit tests for each individual helper function, as well as tests for our main \texttt{ars()} function. Due to the stochastic nature of some of our functions, many tests are explicitly set with a seed
+for the pseduo-random number generator so that their output becomes deterministic, and thus, verifiable by
+an \texttt{expect\_equal()} assertion.
+
+In addition to automated testing, we ran a series of Kolmogorov-Smirnov (KS) tests to verify that the empirical CDF of our generated samples matched the CDF of the true distribution. The KS test tests the null the hypothesis that the samples drawn from our algorithm match the target distribution. Thus, for the following tests, if our algorithm is working correclty, we expect high $p$-values. We ran the following KS tests:
 
 \subsection*{Contributions}
-Jiang Zhu has written the squeezing function, the precheck function and some part of the ars function.Jiang Zhu has also written the test for squeezing function,precheck function and the common cases of the ars function.
+Jiang Zhu has written the squeezing function, the precheck function and some part of the ars function. Jiang Zhu has also written the test for squeezing function, precheck function and the common cases of the ars function.
 
-\subsection*{Contributions}
-Tian Xia has written the envelope funciton, returning the value evaluated by the u_k(x), test code for testing envelope function, intersects function, update function and part test code of the main function under some abnormal input functions.
+Tian Xia has written the envelope funciton, returning the value evaluated by the $u_k(x)$, test code for testing envelope function, intersects function, update function and part test code of the main function under some abnormal input functions.
 
-Birce wrote the codes for finding initial set of abscissae points if not provided by the user, finding and updating the intersection points of the envelope function, updating abscissae and vectors \texttt{hx} and \texttt{dhx} and finally the accept/reject function that takes returns the decision regarding a new sampled point. 
+Birce wrote the codes for finding initial set of abscissae points if not provided by the user, finding and updating the intersection points of the envelope function, updating abscissae and vectors \texttt{hx} and \texttt{dhx} and finally the accept/reject function that takes returns the decision regarding a new sampled point.
 
 
 \end{document}
