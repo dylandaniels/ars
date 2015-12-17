@@ -54,6 +54,7 @@ sampleFromEnvelope <- function (abscissae, z, integrals, u, hx, dhx) {
 }
 
 
+# Updates the integrals when a new value is evaluated.
 updateIntegrals <- function (xStar, oldAbscissae, oldIntegrals, newZ, u, dhx) {
   # Find index i where oldAbscissae[i] <= xStar <= oldAbscissae[i+1]
   i <- sum(oldAbscissae <= xStar)
